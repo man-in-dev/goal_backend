@@ -57,6 +57,8 @@ const updateNewsEventValidation = [
 router.get('/', newsEventController_1.getAllNewsEvents);
 router.get('/recent', newsEventController_1.getRecentNewsEvents);
 router.get('/tags', newsEventController_1.getNewsEventsByTags);
+router.post('/:id/like', newsEventController_1.toggleNewsEventLike);
+router.post('/:id/share', newsEventController_1.incrementNewsEventShare);
 // Protected routes (for admin dashboard)
 router.use(auth_1.authenticateToken);
 router.get('/stats', newsEventController_1.getNewsEventStats);

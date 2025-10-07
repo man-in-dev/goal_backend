@@ -9,6 +9,7 @@ import newsEventRoutes from './newsEvent';
 import blogRoutes from './blog';
 import publicNoticeRoutes from './publicNotice';
 import resultRoutes from './result';
+import careerApplicationRoutes from './careerApplication';
 
 const router = Router();
 
@@ -23,6 +24,7 @@ router.use('/news-events', newsEventRoutes);
 router.use('/blog', blogRoutes);
 router.use('/public-notice', publicNoticeRoutes);
 router.use('/result', resultRoutes);
+router.use('/career-applications', careerApplicationRoutes);
 
 // Health check route
 router.get('/health', (req, res) => {

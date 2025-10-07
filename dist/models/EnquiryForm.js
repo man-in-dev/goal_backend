@@ -49,7 +49,7 @@ const enquiryFormSchema = new mongoose_1.Schema({
     },
     email: {
         type: String,
-        required: [true, 'Email is required'],
+        required: false,
         trim: true,
         lowercase: true,
         match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
@@ -74,13 +74,13 @@ const enquiryFormSchema = new mongoose_1.Schema({
     },
     state: {
         type: String,
-        required: false,
+        required: [true, 'State is required'],
         trim: true,
         maxlength: [50, 'State cannot exceed 50 characters']
     },
     district: {
         type: String,
-        required: false,
+        required: [true, 'District is required'],
         trim: true,
         maxlength: [50, 'District cannot exceed 50 characters']
     },

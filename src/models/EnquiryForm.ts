@@ -3,12 +3,12 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IEnquiryForm extends Document {
   name: string;
   phone: string;
-  email: string;
+  email?: string;
   studying?: string; // Optional for backward compatibility
   studyLevel?: string; // Alternative field name
   course: string;
-  state?: string; // Optional for simple forms
-  district?: string; // Optional for simple forms
+  state: string; // Required field
+  district: string; // Required field
   address?: string; // Optional for simple forms
   query?: string; // Optional for simple forms
   message?: string; // Alternative field name
@@ -34,7 +34,7 @@ const enquiryFormSchema = new Schema<IEnquiryForm>({
   },
   email: {
     type: String,
-    required: [true, 'Email is required'],
+    required: false,
     trim: true,
     lowercase: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
@@ -59,13 +59,13 @@ const enquiryFormSchema = new Schema<IEnquiryForm>({
   },
   state: {
     type: String,
-    required: false,
+    required: [true, 'State is required'],
     trim: true,
     maxlength: [50, 'State cannot exceed 50 characters']
   },
   district: {
     type: String,
-    required: false,
+    required: [true, 'District is required'],
     trim: true,
     maxlength: [50, 'District cannot exceed 50 characters']
   },

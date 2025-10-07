@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNewsEventStats = exports.getNewsEventsByTags = exports.getRecentNewsEvents = exports.deleteNewsEvent = exports.updateNewsEvent = exports.createNewsEvent = exports.getNewsEventById = exports.getAllNewsEvents = void 0;
+exports.incrementNewsEventShare = exports.toggleNewsEventLike = exports.getNewsEventStats = exports.getNewsEventsByTags = exports.getRecentNewsEvents = exports.deleteNewsEvent = exports.updateNewsEvent = exports.createNewsEvent = exports.getNewsEventById = exports.getAllNewsEvents = void 0;
 const NewsEvent_1 = __importDefault(require("../models/NewsEvent"));
 const asyncHandler_1 = require("../utils/asyncHandler");
 const response_1 = require("../utils/response");
@@ -152,5 +152,41 @@ exports.getNewsEventStats = (0, asyncHandler_1.asyncHandler)((req, res) => __awa
     });
     (0, response_1.successResponse)(res, Object.assign(Object.assign({}, stats[0]), { todayNewsEvents,
         weekNewsEvents }));
+}));
+// Toggle like for a news/event
+exports.toggleNewsEventLike = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const newsEvent = yield NewsEvent_1.default.findById(req.params.id);
+    if (!newsEvent) {
+        return (0, response_1.errorResponse)(res, 'News/Event not found', 404);
+    }
+    // For now, we'll just increment/decrement likes
+    // In a real application, you might want to track which users liked which news/events
+    const { action } = req.body; // 'like' or 'unlike'
+    if (action === 'like') {
+        newsEvent.likes += 1;
+    }
+    else if (action === 'unlike') {
+        newsEvent.likes = Math.max(0, newsEvent.likes - 1);
+    }
+    else {
+        return (0, response_1.errorResponse)(res, 'Invalid action. Use "like" or "unlike"', 400);
+    }
+    yield newsEvent.save();
+    (0, response_1.successResponse)(res, {
+        likes: newsEvent.likes,
+        action: action
+    }, `News/Event ${action}d successfully`);
+}));
+// Increment share count for a news/event
+exports.incrementNewsEventShare = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const newsEvent = yield NewsEvent_1.default.findById(req.params.id);
+    if (!newsEvent) {
+        return (0, response_1.errorResponse)(res, 'News/Event not found', 404);
+    }
+    newsEvent.shares += 1;
+    yield newsEvent.save();
+    (0, response_1.successResponse)(res, {
+        shares: newsEvent.shares
+    }, 'Share count incremented successfully');
 }));
 //# sourceMappingURL=newsEventController.js.map

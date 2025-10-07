@@ -13,7 +13,9 @@ import {
   getBlogsByCategory,
   getBlogsByTags,
   getPopularBlogs,
-  getBlogStats
+  getBlogStats,
+  toggleBlogLike,
+  incrementBlogView
 } from '../controllers/blogController';
 import { authenticateToken } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
@@ -48,6 +50,8 @@ router.get('/category', getBlogsByCategory);
 router.get('/tags', getBlogsByTags);
 router.get('/popular', getPopularBlogs);
 router.get('/slug/:slug', getBlogBySlug);
+router.post('/:id/like', toggleBlogLike);
+router.post('/:id/view', incrementBlogView);
 
 // Protected routes (for admin dashboard)
 router.use(authenticateToken);

@@ -66,7 +66,7 @@ const newsEventSchema = new Schema<INewsEvent>({
   },
   author: {
     type: String,
-    required: [true, 'Author is required'],
+    // required: [true, 'Author is required'],
     trim: true
   },
   isPublished: {
@@ -126,7 +126,7 @@ const newsEventSchema = new Schema<INewsEvent>({
   },
   slug: {
     type: String,
-    required: [true, 'Slug is required'],
+    // required: [true, 'Slug is required'],
     unique: true,
     trim: true
   },

@@ -182,3 +182,48 @@ export const getNewsEventStats = asyncHandler(async (req: Request, res: Response
     weekNewsEvents
   });
 });
+
+// Toggle like for a news/event
+export const toggleNewsEventLike = asyncHandler(async (req: Request, res: Response) => {
+  const newsEvent = await NewsEvent.findById(req.params.id);
+
+  if (!newsEvent) {
+    return errorResponse(res, 'News/Event not found', 404);
+  }
+
+  // For now, we'll just increment/decrement likes
+  // In a real application, you might want to track which users liked which news/events
+  const { action } = req.body; // 'like' or 'unlike'
+
+  if (action === 'like') {
+    newsEvent.likes += 1;
+  } else if (action === 'unlike') {
+    newsEvent.likes = Math.max(0, newsEvent.likes - 1);
+  } else {
+    return errorResponse(res, 'Invalid action. Use "like" or "unlike"', 400);
+  }
+
+  await newsEvent.save();
+
+  successResponse(res, { 
+    likes: newsEvent.likes,
+    action: action 
+  }, `News/Event ${action}d successfully`);
+});
+
+// Increment share count for a news/event
+export const incrementNewsEventShare = asyncHandler(async (req: Request, res: Response) => {
+  const newsEvent = await NewsEvent.findById(req.params.id);
+
+  if (!newsEvent) {
+    return errorResponse(res, 'News/Event not found', 404);
+  }
+
+  newsEvent.shares += 1;
+  await newsEvent.save();
+
+  successResponse(res, { 
+    shares: newsEvent.shares 
+  }, 'Share count incremented successfully');
+});
+

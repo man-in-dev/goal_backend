@@ -7,6 +7,8 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 // import listEndpoints from "express-list-endpoints";
 // import mongoSanitize from "express-mongo-sanitize";
 // import xss from "xss-clean";
@@ -16,6 +18,11 @@ const db_1 = __importDefault(require("./config/db"));
 const routes_1 = __importDefault(require("./routes"));
 const errorHandler_1 = require("./middleware/errorHandler");
 const app = (0, express_1.default)();
+// Create uploads directory if it doesn't exist
+const uploadsDir = path_1.default.join(__dirname, 'uploads', 'resumes');
+if (!fs_1.default.existsSync(uploadsDir)) {
+    fs_1.default.mkdirSync(uploadsDir, { recursive: true });
+}
 // Connect to database
 (0, db_1.default)();
 // Security middleware
@@ -38,7 +45,7 @@ app.use(express_1.default.urlencoded({ extended: true, limit: "10mb" }));
 app.use((0, hpp_1.default)());
 // CORS
 app.use((0, cors_1.default)({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: ["http://localhost:3000", "http://localhost:3001", "https://goal-admin-dashboard.vercel.app"],
     credentials: true,
 }));
 // Request logging middleware
@@ -46,6 +53,8 @@ app.use((req, res, next) => {
     console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
     next();
 });
+// Serve static files (uploads)
+app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, 'uploads')));
 // Mount routes
 app.use("/api", routes_1.default);
 // Root route

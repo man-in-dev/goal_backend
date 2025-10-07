@@ -7,7 +7,9 @@ import {
   deleteNewsEvent,
   getRecentNewsEvents,
   getNewsEventsByTags,
-  getNewsEventStats
+  getNewsEventStats,
+  toggleNewsEventLike,
+  incrementNewsEventShare
 } from '../controllers/newsEventController';
 import { authenticateToken } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
@@ -66,6 +68,8 @@ const updateNewsEventValidation = [
 router.get('/', getAllNewsEvents);
 router.get('/recent', getRecentNewsEvents);
 router.get('/tags', getNewsEventsByTags);
+router.post('/:id/like', toggleNewsEventLike);
+router.post('/:id/share', incrementNewsEventShare);
 
 // Protected routes (for admin dashboard)
 router.use(authenticateToken);

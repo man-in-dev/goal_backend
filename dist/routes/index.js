@@ -14,6 +14,7 @@ const newsEvent_1 = __importDefault(require("./newsEvent"));
 const blog_1 = __importDefault(require("./blog"));
 const publicNotice_1 = __importDefault(require("./publicNotice"));
 const result_1 = __importDefault(require("./result"));
+const careerApplication_1 = __importDefault(require("./careerApplication"));
 const router = (0, express_1.Router)();
 // Mount routes
 router.use('/auth', auth_1.default);
@@ -26,6 +27,7 @@ router.use('/news-events', newsEvent_1.default);
 router.use('/blog', blog_1.default);
 router.use('/public-notice', publicNotice_1.default);
 router.use('/result', result_1.default);
+router.use('/career-applications', careerApplication_1.default);
 // Health check route
 router.get('/health', (req, res) => {
     res.status(200).json({

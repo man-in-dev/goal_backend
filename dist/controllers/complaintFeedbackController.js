@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getComplaintFeedbackStats = exports.deleteComplaintFeedback = exports.updateComplaintFeedback = exports.createComplaintFeedback = exports.getComplaintFeedbackById = exports.getAllComplaintsFeedback = void 0;
+exports.downloadComplaintsFeedbackCSV = exports.getComplaintFeedbackStats = exports.deleteComplaintFeedback = exports.updateComplaintFeedback = exports.createComplaintFeedback = exports.getComplaintFeedbackById = exports.getAllComplaintsFeedback = void 0;
 const ComplaintFeedback_1 = __importDefault(require("../models/ComplaintFeedback"));
 const asyncHandler_1 = require("../utils/asyncHandler");
 const response_1 = require("../utils/response");
@@ -106,5 +106,78 @@ exports.getComplaintFeedbackStats = (0, asyncHandler_1.asyncHandler)((req, res) 
     });
     (0, response_1.successResponse)(res, Object.assign(Object.assign({}, stats[0]), { todayComplaints,
         weekComplaints }));
+}));
+// Download complaints and feedback as CSV
+exports.downloadComplaintsFeedbackCSV = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { status, type, search } = req.query;
+    const query = {};
+    if (status)
+        query.status = status;
+    if (type)
+        query.type = type;
+    if (search) {
+        query.$or = [
+            { name: { $regex: search, $options: 'i' } },
+            { email: { $regex: search, $options: 'i' } },
+            { phone: { $regex: search, $options: 'i' } },
+            { uid: { $regex: search, $options: 'i' } },
+            { rollNo: { $regex: search, $options: 'i' } },
+            { course: { $regex: search, $options: 'i' } },
+            { department: { $regex: search, $options: 'i' } },
+            { message: { $regex: search, $options: 'i' } }
+        ];
+    }
+    const complaintsFeedback = yield ComplaintFeedback_1.default.find(query).sort({ createdAt: -1 });
+    // CSV headers
+    const headers = [
+        'ID',
+        'Is Goal Student',
+        'UID',
+        'Roll Number',
+        'Name',
+        'Course',
+        'Phone',
+        'Email',
+        'Type',
+        'Department',
+        'Message',
+        'Attachment',
+        'Attachment Alt',
+        'Status',
+        'Created At',
+        'Updated At'
+    ];
+    // Convert data to CSV format
+    const csvData = complaintsFeedback.map(item => [
+        item._id,
+        item.isGoalStudent ? 'Yes' : 'No',
+        item.uid || '',
+        item.rollNo || '',
+        item.name || '',
+        item.course || '',
+        item.phone || '',
+        item.email || '',
+        item.type || '',
+        item.department || '',
+        item.message || '',
+        item.attachment || '',
+        item.attachmentAlt || '',
+        item.status || '',
+        item.createdAt ? new Date(item.createdAt).toISOString() : '',
+        item.updatedAt ? new Date(item.updatedAt).toISOString() : ''
+    ]);
+    // Create CSV content
+    const csvContent = [
+        headers.join(','),
+        ...csvData.map(row => row.map(field => typeof field === 'string' && field.includes(',')
+            ? `"${field.replace(/"/g, '""')}"`
+            : field).join(','))
+    ].join('\n');
+    // Set response headers for CSV download
+    const filename = `complaints_feedback_${new Date().toISOString().split('T')[0]}.csv`;
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Cache-Control', 'no-cache');
+    res.send(csvContent);
 }));
 //# sourceMappingURL=complaintFeedbackController.js.map

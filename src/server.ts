@@ -2,6 +2,8 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import path from "path";
+import fs from "fs";
 // import listEndpoints from "express-list-endpoints";
 // import mongoSanitize from "express-mongo-sanitize";
 // import xss from "xss-clean";
@@ -13,6 +15,12 @@ import routes from "./routes";
 import { errorHandler, notFound } from "./middleware/errorHandler";
 
 const app = express();
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads', 'resumes');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 // Connect to database
 connectDB();
@@ -45,7 +53,7 @@ app.use(hpp());
 // CORS
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001", "https://goal-admin-dashboard.vercel.app"],
+    origin: ["http://139.59.87.184:3000", "http://139.59.87.184:3001"],
     credentials: true,
   })
 );
@@ -55,6 +63,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
   next();
 });
+
+// Serve static files (uploads)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Mount routes
 app.use("/api", routes);

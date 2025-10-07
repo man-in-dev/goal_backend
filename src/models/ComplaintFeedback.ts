@@ -5,7 +5,7 @@ export interface IComplaintFeedback extends Document {
   uid?: string;
   rollNo?: string;
   name: string;
-  course?: string;
+  course: string;
   phone: string;
   email: string;
   type: 'complaint' | 'feedback' | 'suggestion';
@@ -48,9 +48,7 @@ const complaintFeedbackSchema = new Schema<IComplaintFeedback>({
   },
   course: {
     type: String,
-    required: function() {
-      return this.isGoalStudent;
-    },
+    required: [true, 'Course is required'],
     trim: true,
     maxlength: [100, 'Course cannot exceed 100 characters']
   },

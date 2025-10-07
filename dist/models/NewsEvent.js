@@ -73,7 +73,7 @@ const newsEventSchema = new mongoose_1.Schema({
     },
     author: {
         type: String,
-        required: [true, 'Author is required'],
+        // required: [true, 'Author is required'],
         trim: true
     },
     isPublished: {
@@ -133,7 +133,7 @@ const newsEventSchema = new mongoose_1.Schema({
     },
     slug: {
         type: String,
-        required: [true, 'Slug is required'],
+        // required: [true, 'Slug is required'],
         unique: true,
         trim: true
     },

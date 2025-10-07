@@ -64,9 +64,7 @@ const complaintFeedbackSchema = new mongoose_1.Schema({
     },
     course: {
         type: String,
-        required: function () {
-            return this.isGoalStudent;
-        },
+        required: [true, 'Course is required'],
         trim: true,
         maxlength: [100, 'Course cannot exceed 100 characters']
     },

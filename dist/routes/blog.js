@@ -34,6 +34,8 @@ router.get('/category', blogController_1.getBlogsByCategory);
 router.get('/tags', blogController_1.getBlogsByTags);
 router.get('/popular', blogController_1.getPopularBlogs);
 router.get('/slug/:slug', blogController_1.getBlogBySlug);
+router.post('/:id/like', blogController_1.toggleBlogLike);
+router.post('/:id/view', blogController_1.incrementBlogView);
 // Protected routes (for admin dashboard)
 router.use(auth_1.authenticateToken);
 router.get('/stats', blogController_1.getBlogStats);

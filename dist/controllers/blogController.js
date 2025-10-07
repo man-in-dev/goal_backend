@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBlogStats = exports.getPopularBlogs = exports.getBlogsByTags = exports.getBlogsByCategory = exports.getRecentBlogs = exports.getFeaturedBlogs = exports.toggleBlogFeatured = exports.toggleBlogPublish = exports.deleteBlog = exports.updateBlog = exports.createBlog = exports.getBlogBySlug = exports.getBlogById = exports.getAllBlogs = void 0;
+exports.getBlogStats = exports.incrementBlogView = exports.toggleBlogLike = exports.getPopularBlogs = exports.getBlogsByTags = exports.getBlogsByCategory = exports.getRecentBlogs = exports.getFeaturedBlogs = exports.toggleBlogFeatured = exports.toggleBlogPublish = exports.deleteBlog = exports.updateBlog = exports.createBlog = exports.getBlogBySlug = exports.getBlogById = exports.getAllBlogs = void 0;
 const Blog_1 = __importDefault(require("../models/Blog"));
 const asyncHandler_1 = require("../utils/asyncHandler");
 const response_1 = require("../utils/response");
@@ -184,6 +184,42 @@ exports.getPopularBlogs = (0, asyncHandler_1.asyncHandler)((req, res) => __await
         .sort({ views: -1, likes: -1 })
         .limit(Number(limit));
     (0, response_1.successResponse)(res, blogs);
+}));
+// Toggle like for a blog
+exports.toggleBlogLike = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const blog = yield Blog_1.default.findById(req.params.id);
+    if (!blog) {
+        return (0, response_1.errorResponse)(res, 'Blog not found', 404);
+    }
+    // For now, we'll just increment/decrement likes
+    // In a real application, you might want to track which users liked which blogs
+    const { action } = req.body; // 'like' or 'unlike'
+    if (action === 'like') {
+        blog.likes += 1;
+    }
+    else if (action === 'unlike') {
+        blog.likes = Math.max(0, blog.likes - 1);
+    }
+    else {
+        return (0, response_1.errorResponse)(res, 'Invalid action. Use "like" or "unlike"', 400);
+    }
+    yield blog.save();
+    (0, response_1.successResponse)(res, {
+        likes: blog.likes,
+        action: action
+    }, `Blog ${action}d successfully`);
+}));
+// Increment view count for a blog
+exports.incrementBlogView = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const blog = yield Blog_1.default.findById(req.params.id);
+    if (!blog) {
+        return (0, response_1.errorResponse)(res, 'Blog not found', 404);
+    }
+    blog.views += 1;
+    yield blog.save();
+    (0, response_1.successResponse)(res, {
+        views: blog.views
+    }, 'View count incremented successfully');
 }));
 // Get blog statistics
 exports.getBlogStats = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

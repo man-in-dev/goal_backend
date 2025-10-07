@@ -222,6 +222,50 @@ export const getPopularBlogs = asyncHandler(async (req: Request, res: Response) 
   successResponse(res, blogs);
 });
 
+// Toggle like for a blog
+export const toggleBlogLike = asyncHandler(async (req: Request, res: Response) => {
+  const blog = await Blog.findById(req.params.id);
+
+  if (!blog) {
+    return errorResponse(res, 'Blog not found', 404);
+  }
+
+  // For now, we'll just increment/decrement likes
+  // In a real application, you might want to track which users liked which blogs
+  const { action } = req.body; // 'like' or 'unlike'
+  
+  if (action === 'like') {
+    blog.likes += 1;
+  } else if (action === 'unlike') {
+    blog.likes = Math.max(0, blog.likes - 1);
+  } else {
+    return errorResponse(res, 'Invalid action. Use "like" or "unlike"', 400);
+  }
+
+  await blog.save();
+
+  successResponse(res, { 
+    likes: blog.likes,
+    action: action 
+  }, `Blog ${action}d successfully`);
+});
+
+// Increment view count for a blog
+export const incrementBlogView = asyncHandler(async (req: Request, res: Response) => {
+  const blog = await Blog.findById(req.params.id);
+
+  if (!blog) {
+    return errorResponse(res, 'Blog not found', 404);
+  }
+
+  blog.views += 1;
+  await blog.save();
+
+  successResponse(res, { 
+    views: blog.views 
+  }, 'View count incremented successfully');
+});
+
 // Get blog statistics
 export const getBlogStats = asyncHandler(async (req: Request, res: Response) => {
   const stats = await Blog.aggregate([

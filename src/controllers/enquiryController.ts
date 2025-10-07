@@ -115,3 +115,83 @@ export const getEnquiryStats = asyncHandler(async (req: Request, res: Response) 
     weekEnquiries
   });
 });
+
+// Download enquiries as CSV
+export const downloadEnquiriesCSV = asyncHandler(async (req: Request, res: Response) => {
+  const { status, search } = req.query;
+  
+  const query: any = {};
+  
+  if (status) query.status = status;
+  if (search) {
+    query.$or = [
+      { name: { $regex: search, $options: 'i' } },
+      { email: { $regex: search, $options: 'i' } },
+      { phone: { $regex: search, $options: 'i' } },
+      { course: { $regex: search, $options: 'i' } },
+      { studying: { $regex: search, $options: 'i' } },
+      { state: { $regex: search, $options: 'i' } },
+      { district: { $regex: search, $options: 'i' } }
+    ];
+  }
+
+  const enquiries = await EnquiryForm.find(query).sort({ createdAt: -1 });
+
+  // CSV headers
+  const headers = [
+    'ID',
+    'Name',
+    'Phone',
+    'Email',
+    'Studying',
+    'Course',
+    'State',
+    'District',
+    'Address',
+    'Query',
+    'Country Code',
+    'Source',
+    'Status',
+    'Created At',
+    'Updated At'
+  ];
+
+  // Convert data to CSV format
+  const csvData = enquiries.map(enquiry => [
+    enquiry._id,
+    enquiry.name || '',
+    enquiry.phone || '',
+    enquiry.email || '',
+    enquiry.studying || enquiry.studyLevel || '',
+    enquiry.course || '',
+    enquiry.state || '',
+    enquiry.district || '',
+    enquiry.address || '',
+    enquiry.query || enquiry.message || '',
+    enquiry.countryCode || '',
+    enquiry.source || '',
+    enquiry.status || '',
+    enquiry.createdAt ? new Date(enquiry.createdAt).toISOString() : '',
+    enquiry.updatedAt ? new Date(enquiry.updatedAt).toISOString() : ''
+  ]);
+
+  // Create CSV content
+  const csvContent = [
+    headers.join(','),
+    ...csvData.map(row => 
+      row.map(field => 
+        typeof field === 'string' && field.includes(',') 
+          ? `"${field.replace(/"/g, '""')}"` 
+          : field
+      ).join(',')
+    )
+  ].join('\n');
+
+  // Set response headers for CSV download
+  const filename = `enquiries_${new Date().toISOString().split('T')[0]}.csv`;
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.setHeader('Cache-Control', 'no-cache');
+  
+  res.send(csvContent);
+});
