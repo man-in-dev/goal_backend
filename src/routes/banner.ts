@@ -45,7 +45,7 @@ router.get('/stats', getBannerStats);
 router.get('/:id', getBannerById);
 // router.post('/', bannerValidation, validateRequest, createBanner);
 router.post('/', createBanner);
-router.put('/:id', bannerValidation, validateRequest, updateBanner);
+router.put('/:id', updateBanner);
 router.delete('/:id', deleteBanner);
 router.patch('/:id/toggle-status', toggleBannerStatus);
 
