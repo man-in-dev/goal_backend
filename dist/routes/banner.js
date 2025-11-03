@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const bannerController_1 = require("../controllers/bannerController");
 const auth_1 = require("../middleware/auth");
-const validation_1 = require("../middleware/validation");
 const express_validator_1 = require("express-validator");
 const router = express_1.default.Router();
 // Validation rules
@@ -35,7 +34,7 @@ router.get('/stats', bannerController_1.getBannerStats);
 router.get('/:id', bannerController_1.getBannerById);
 // router.post('/', bannerValidation, validateRequest, createBanner);
 router.post('/', bannerController_1.createBanner);
-router.put('/:id', bannerValidation, validation_1.validateRequest, bannerController_1.updateBanner);
+router.put('/:id', bannerController_1.updateBanner);
 router.delete('/:id', bannerController_1.deleteBanner);
 router.patch('/:id/toggle-status', bannerController_1.toggleBannerStatus);
 exports.default = router;
