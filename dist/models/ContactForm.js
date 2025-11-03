@@ -43,13 +43,17 @@ const contactFormSchema = new mongoose_1.Schema({
     },
     email: {
         type: String,
-        required: [true, "Email is required"],
+        required: false,
         trim: true,
         lowercase: true,
-        match: [
-            /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-            "Please enter a valid email",
-        ],
+        validate: {
+            validator: function (v) {
+                if (!v)
+                    return true; // Allow empty
+                return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v);
+            },
+            message: "Please enter a valid email"
+        }
     },
     phone: {
         type: String,
@@ -67,15 +71,27 @@ const contactFormSchema = new mongoose_1.Schema({
         required: [true, "District is required"],
         trim: true,
     },
+    studying: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [50, "Studying cannot exceed 50 characters"],
+    },
+    course: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [100, "Course cannot exceed 100 characters"],
+    },
     subject: {
         type: String,
-        required: [true, "Subject is required"],
+        required: false,
         trim: true,
         maxlength: [200, "Subject cannot exceed 200 characters"],
     },
     message: {
         type: String,
-        required: [true, "Message is required"],
+        required: false,
         trim: true,
         maxlength: [1000, "Message cannot exceed 1000 characters"],
     },

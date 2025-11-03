@@ -21,19 +21,18 @@ export const submitContact = asyncHandler(
       location,
       department,
       source,
+      studying,
     } = req.body;
 
-    logger.info("Contact form submission attempt", { email, subject });
+    logger.info("Contact form submission attempt", { email: email || "N/A", subject: subject || "N/A", name });
 
     // Validate required fields
     if (
       !name ||
-      !email ||
       !phone ||
       !state ||
       !district ||
-      !subject ||
-      !message
+      !studying
     ) {
       throw new CustomError("Please provide all required fields", 400);
     }
@@ -44,6 +43,8 @@ export const submitContact = asyncHandler(
       phone,
       state,
       district,
+      studying,
+      course: req.body.course,
       subject,
       message,
       location,

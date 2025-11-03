@@ -19,20 +19,20 @@ const logger_1 = require("../utils/logger");
 class ContactService {
     static createContact(contactData) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Check for duplicate contact from same email in last 24 hours
+            // Check for duplicate contact from same phone in last 24 hours
             const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
             const existingContact = yield ContactForm_1.default.findOne({
-                email: contactData.email,
+                phone: contactData.phone,
                 createdAt: { $gte: oneDayAgo },
             });
             if (existingContact) {
-                throw new errorHandler_1.CustomError("A contact form has already been submitted with this email in the last 24 hours", 400);
+                throw new errorHandler_1.CustomError("A contact form has already been submitted with this phone number in the last 24 hours", 400);
             }
             const contact = yield ContactForm_1.default.create(Object.assign(Object.assign({}, contactData), { source: contactData.source || "website" }));
             logger_1.logger.info("Contact form created successfully", {
                 contactId: contact._id,
-                email: contact.email,
-                subject: contact.subject,
+                email: contact.email || "N/A",
+                subject: contact.subject || "N/A",
             });
             return contact;
         });

@@ -18,9 +18,9 @@ exports.enquiryFormSchema = zod_1.z.object({
         .trim()
         .optional(),
     studying: zod_1.z.string()
+        .min(1, 'Current class/studying is required')
         .max(100, 'Studying field cannot exceed 100 characters')
-        .trim()
-        .optional(),
+        .trim(),
     studyLevel: zod_1.z.string()
         .max(100, 'Study level cannot exceed 100 characters')
         .trim()

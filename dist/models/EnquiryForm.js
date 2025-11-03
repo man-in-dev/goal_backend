@@ -56,7 +56,7 @@ const enquiryFormSchema = new mongoose_1.Schema({
     },
     studying: {
         type: String,
-        required: false,
+        required: [true, 'Current class/studying is required'],
         trim: true,
         maxlength: [100, 'Studying field cannot exceed 100 characters']
     },

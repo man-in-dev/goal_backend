@@ -10,6 +10,7 @@ import blogRoutes from './blog';
 import publicNoticeRoutes from './publicNotice';
 import resultRoutes from './result';
 import careerApplicationRoutes from './careerApplication';
+import gvetRoutes from './gvet';
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.use('/blog', blogRoutes);
 router.use('/public-notice', publicNoticeRoutes);
 router.use('/result', resultRoutes);
 router.use('/career-applications', careerApplicationRoutes);
+router.use('/gvet', gvetRoutes);
 
 // Health check route
 router.get('/health', (req, res) => {

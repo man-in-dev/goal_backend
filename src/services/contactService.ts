@@ -5,26 +5,28 @@ import { logger } from "../utils/logger";
 export class ContactService {
   static async createContact(contactData: {
     name: string;
-    email: string;
+    email?: string;
     phone: string;
     state: string;
     district: string;
-    subject: string;
-    message: string;
+    studying?: string;
+    course?: string;
+    subject?: string;
+    message?: string;
     location?: string;
     department?: string;
     source?: string;
   }): Promise<IContactForm> {
-    // Check for duplicate contact from same email in last 24 hours
+    // Check for duplicate contact from same phone in last 24 hours
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const existingContact = await ContactForm.findOne({
-      email: contactData.email,
+      phone: contactData.phone,
       createdAt: { $gte: oneDayAgo },
     });
 
     if (existingContact) {
       throw new CustomError(
-        "A contact form has already been submitted with this email in the last 24 hours",
+        "A contact form has already been submitted with this phone number in the last 24 hours",
         400
       );
     }
@@ -36,8 +38,8 @@ export class ContactService {
 
     logger.info("Contact form created successfully", {
       contactId: contact._id,
-      email: contact.email,
-      subject: contact.subject,
+      email: contact.email || "N/A",
+      subject: contact.subject || "N/A",
     });
 
     return contact;

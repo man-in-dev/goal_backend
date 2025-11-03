@@ -19,16 +19,14 @@ const errorHandler_1 = require("../middleware/errorHandler");
 // @route   POST /api/contact/submit
 // @access  Public
 exports.submitContact = (0, asyncHandler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, email, phone, state, district, subject, message, location, department, source, } = req.body;
-    logger_1.logger.info("Contact form submission attempt", { email, subject });
+    const { name, email, phone, state, district, subject, message, location, department, source, studying, } = req.body;
+    logger_1.logger.info("Contact form submission attempt", { email: email || "N/A", subject: subject || "N/A", name });
     // Validate required fields
     if (!name ||
-        !email ||
         !phone ||
         !state ||
         !district ||
-        !subject ||
-        !message) {
+        !studying) {
         throw new errorHandler_1.CustomError("Please provide all required fields", 400);
     }
     const contact = yield contactService_1.ContactService.createContact({
@@ -37,6 +35,8 @@ exports.submitContact = (0, asyncHandler_1.asyncHandler)((req, res, next) => __a
         phone,
         state,
         district,
+        studying,
+        course: req.body.course,
         subject,
         message,
         location,

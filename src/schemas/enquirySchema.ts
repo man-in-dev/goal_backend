@@ -19,9 +19,9 @@ export const enquiryFormSchema = z.object({
     .optional(),
   
   studying: z.string()
+    .min(1, 'Current class/studying is required')
     .max(100, 'Studying field cannot exceed 100 characters')
-    .trim()
-    .optional(),
+    .trim(),
   
   studyLevel: z.string()
     .max(100, 'Study level cannot exceed 100 characters')
