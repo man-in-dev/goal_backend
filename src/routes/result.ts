@@ -53,11 +53,11 @@ router.get('/batch/:batch', getResultsByBatch);
 router.use(authenticateToken);
 router.get('/', getAllResults);
 router.get('/stats', getResultStats);
-router.get('/:id', getResultById);
 router.post('/', resultValidation, validateRequest, createResult);
 router.post('/upload-csv', upload.single('csvFile'), uploadCSVResults);
+router.delete('/multiple', deleteMultipleResults); // Must be before /:id route
+router.get('/:id', getResultById);
 router.put('/:id', resultValidation, validateRequest, updateResult);
 router.delete('/:id', deleteResult);
-router.delete('/multiple', deleteMultipleResults);
 
 export default router;

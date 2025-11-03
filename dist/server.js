@@ -45,7 +45,7 @@ app.use(express_1.default.urlencoded({ extended: true, limit: "10mb" }));
 app.use((0, hpp_1.default)());
 // CORS
 app.use((0, cors_1.default)({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: ["http://139.59.87.184:3000", "http://139.59.87.184:3001"],
     credentials: true,
 }));
 // Request logging middleware
