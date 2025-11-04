@@ -38,6 +38,9 @@ const resultValidation = [
 // Public routes
 router.get('/course/:course', resultController_1.getResultsByCourse);
 router.get('/batch/:batch', resultController_1.getResultsByBatch);
+router.get('/student/:rollNo', resultController_1.getResultsByRollNo);
+router.get('/comparison/:examId', resultController_1.getExamComparison);
+router.get('/:rollNo/:batch', resultController_1.getResultById); // Public route for student results
 // Protected routes (for admin dashboard)
 router.use(auth_1.authenticateToken);
 router.get('/', resultController_1.getAllResults);
@@ -45,8 +48,7 @@ router.get('/stats', resultController_1.getResultStats);
 router.post('/', resultValidation, validation_1.validateRequest, resultController_1.createResult);
 router.post('/upload-csv', resultController_1.upload.single('csvFile'), resultController_1.uploadCSVResults);
 router.delete('/multiple', resultController_1.deleteMultipleResults); // Must be before /:id route
-router.get('/:id', resultController_1.getResultById);
-router.put('/:id', resultValidation, validation_1.validateRequest, resultController_1.updateResult);
+router.put('/:id', resultController_1.updateResult);
 router.delete('/:id', resultController_1.deleteResult);
 exports.default = router;
 //# sourceMappingURL=result.js.map

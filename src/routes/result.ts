@@ -10,6 +10,8 @@ import {
   getResultStats,
   getResultsByCourse,
   getResultsByBatch,
+  getResultsByRollNo,
+  getExamComparison,
   upload
 } from '../controllers/resultController';
 import { authenticateToken } from '../middleware/auth';
@@ -48,6 +50,9 @@ const resultValidation = [
 // Public routes
 router.get('/course/:course', getResultsByCourse);
 router.get('/batch/:batch', getResultsByBatch);
+router.get('/student/:rollNo', getResultsByRollNo);
+router.get('/comparison/:examId', getExamComparison);
+router.get('/:rollNo/:batch', getResultById); // Public route for student results
 
 // Protected routes (for admin dashboard)
 router.use(authenticateToken);
@@ -56,8 +61,7 @@ router.get('/stats', getResultStats);
 router.post('/', resultValidation, validateRequest, createResult);
 router.post('/upload-csv', upload.single('csvFile'), uploadCSVResults);
 router.delete('/multiple', deleteMultipleResults); // Must be before /:id route
-router.get('/:id', getResultById);
-router.put('/:id', resultValidation, validateRequest, updateResult);
+router.put('/:id', updateResult);
 router.delete('/:id', deleteResult);
 
 export default router;

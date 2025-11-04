@@ -159,6 +159,37 @@ const ResultSchema = new mongoose_1.Schema({
         type: String,
         required: [true, 'Uploaded by is required'],
         trim: true
+    },
+    // ============================================
+    // NEW MINIMAL FIELDS FOR BEST FILTERING
+    // ============================================
+    testType: {
+        type: String,
+        enum: ['CLASSROOM_TEST', 'SURPRISE_TEST', 'MOCK_TEST', 'FINAL_TEST'],
+        default: 'CLASSROOM_TEST',
+        index: true
+    },
+    examId: {
+        type: String,
+        trim: true,
+        index: true,
+        sparse: true // Allow null values during migration
+    },
+    batchYear: {
+        type: Number,
+        index: true,
+        sparse: true // Allow null values during migration
+    },
+    batchCode: {
+        type: String,
+        trim: true,
+        index: true,
+        sparse: true // Allow null values during migration
+    },
+    totalStudents: {
+        type: Number,
+        min: 1,
+        sparse: true // Allow null values during migration
     }
 }, {
     timestamps: true
@@ -169,5 +200,9 @@ ResultSchema.index({ rollNo: 1 });
 ResultSchema.index({ studentName: 1 });
 ResultSchema.index({ rank: 1 });
 ResultSchema.index({ batch: 1, branch: 1 });
+// New indexes for optimized filtering
+ResultSchema.index({ testType: 1, batchYear: 1 }); // Compound index for test type + batch year filtering
+ResultSchema.index({ examId: 1, rank: 1 }); // Compound index for finding toppers efficiently
+ResultSchema.index({ batchYear: 1, batchCode: 1 }); // Compound index for batch filtering
 exports.default = mongoose_1.default.model('Result', ResultSchema);
 //# sourceMappingURL=Result.js.map

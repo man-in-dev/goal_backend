@@ -31,6 +31,9 @@ export const getAllResults = asyncHandler(async (req: Request, res: Response) =>
     branch, 
     testDate, 
     search,
+    testType,
+    batchYear,
+    batchCode,
     sortBy = 'testDate',
     sortOrder = 'desc'
   } = req.query;
@@ -40,6 +43,9 @@ export const getAllResults = asyncHandler(async (req: Request, res: Response) =>
   if (course) query.course = course;
   if (batch) query.batch = batch;
   if (branch) query.branch = branch;
+  if (testType) query.testType = testType;
+  if (batchYear) query.batchYear = parseInt(batchYear as string);
+  if (batchCode) query.batchCode = batchCode;
   if (testDate) {
     const date = new Date(testDate as string);
     query.testDate = {
@@ -76,15 +82,74 @@ export const getAllResults = asyncHandler(async (req: Request, res: Response) =>
   });
 });
 
-// Get single result
+// Get single result (by rollNo and batch)
 export const getResultById = asyncHandler(async (req: Request, res: Response) => {
-  const result = await Result.findById(req.params.id);
+  const { rollNo, batch } = req.params;
+
+  console.log('Searching for results:', { rollNo, batch });
+
+  // Try multiple batch formats to match the database
+  let query: any = { rollNo };
   
-  if (!result) {
-    return errorResponse(res, 'Result not found', 404);
+  if (batch && batch !== 'default') {
+    // Try different batch formats
+    const batchFormats = [
+      batch + " Batch",
+      batch + " batch",
+      batch,
+      batch.trim(),
+      `BTBM${batch.slice(-2)}-01`, // Example: 2025 -> BTBM25-01
+    ];
+    
+    console.log('Trying batch formats:', batchFormats);
+    
+    // First try with batch filter
+    query.batch = { $in: batchFormats };
+  }
+  
+  let results = await Result.find(query).sort({ testDate: -1 });
+  console.log(`Found ${results.length} results with batch filter`);
+  
+  // If no results found with batch, try without batch filter
+  if (results.length === 0 && batch && batch !== 'default') {
+    console.log('No results with batch, trying without batch filter');
+    query = { rollNo };
+    results = await Result.find(query).sort({ testDate: -1 });
+    console.log(`Found ${results.length} results without batch filter`);
+    
+    // Log unique batch values for this rollNo to help debug
+    if (results.length > 0) {
+      const uniqueBatches = [...new Set(results.map(r => r.batch))];
+      console.log('Available batch values for this rollNo:', uniqueBatches);
+    }
+  }
+  
+  if (!results || results.length === 0) {
+    return errorResponse(res, 'No results found for this roll number', 404);
   }
 
-  successResponse(res, result);
+  // Get student info from first result
+  const studentInfo = {
+    rollNo: results[0].rollNo,
+    studentName: results[0].studentName,
+    course: results[0].course,
+    branch: results[0].branch
+  };
+
+  // Group results by test type (CLASSROOM TEST or SURPRISE TEST based on course name)
+  const classroomTests = results.filter(r => 
+    !r.course.toLowerCase().includes('surprise')
+  );
+  const surpriseTests = results.filter(r => 
+    r.course.toLowerCase().includes('surprise')
+  );
+
+  successResponse(res, {
+    studentInfo,
+    classroomTests,
+    surpriseTests,
+    allResults: results
+  });
 });
 
 // Create new result
@@ -156,9 +221,27 @@ export const uploadCSVResults = asyncHandler(async (req: Request, res: Response)
         
         try {
           // Validate and transform the data
-          const resultData = {
-            course: row.COURSE?.trim(),
-            testDate: new Date(row['TEST DATE']),
+          const course = row.COURSE?.trim();
+          const batch = row.BATCH?.trim();
+          const testDate = new Date(row['TEST DATE']);
+          
+          // Generate new fields if not provided
+          const testType = row['TEST TYPE']?.trim() || 
+            (course?.toLowerCase().includes('surprise') ? 'SURPRISE_TEST' : 'CLASSROOM_TEST');
+          
+          const examId = row['EXAM ID']?.trim() || 
+            `${testType === 'SURPRISE_TEST' ? 'ST' : 'CT'}-${testDate.toISOString().split('T')[0]}-${batch?.replace(/\s+/g, '-')}`;
+          
+          const batchYear = row['BATCH YEAR'] ? parseInt(row['BATCH YEAR']) : 
+            (batch ? parseInt(batch.match(/\d{4}/)?.[0] || new Date().getFullYear().toString()) : undefined);
+          
+          const batchCode = row['BATCH CODE']?.trim() || batch;
+          
+          const totalStudents = row['TOTAL STUDENTS'] ? parseInt(row['TOTAL STUDENTS']) : undefined;
+
+          const resultData: any = {
+            course,
+            testDate,
             rank: parseInt(row.RANK),
             rollNo: row['ROLL NO']?.trim(),
             studentName: row['STUDENT NAME']?.trim(),
@@ -179,9 +262,15 @@ export const uploadCSVResults = asyncHandler(async (req: Request, res: Response)
             marksPercentage: parseFloat(row['MARKS%']) || 0,
             wPercentage: parseFloat(row['W%']) || 0,
             percentile: parseFloat(row.PERCENTILE) || 0,
-            batch: row.BATCH?.trim(),
+            batch,
             branch: row.BRANCH?.trim(),
-            uploadedBy: req.body.uploadedBy || 'admin'
+            uploadedBy: req.body.uploadedBy || 'admin',
+            // New optional fields
+            testType,
+            examId,
+            ...(batchYear && { batchYear }),
+            ...(batchCode && { batchCode }),
+            ...(totalStudents && { totalStudents })
           };
 
           // Basic validation
@@ -340,6 +429,115 @@ export const getResultsByBatch = asyncHandler(async (req: Request, res: Response
     .limit(Number(limit));
 
   successResponse(res, results);
+});
+
+// Get exam topper and student comparison data
+export const getExamComparison = asyncHandler(async (req: Request, res: Response) => {
+  const { examId } = req.params;
+  const { rollNo } = req.query;
+
+  if (!rollNo) {
+    return errorResponse(res, 'Roll number is required', 400);
+  }
+
+  // Get the student's result for this exam
+  const studentResult = await Result.findById(examId);
+  if (!studentResult) {
+    return errorResponse(res, 'Exam result not found', 404);
+  }
+
+  // Verify the roll number matches
+  if (studentResult.rollNo !== rollNo) {
+    return errorResponse(res, 'Unauthorized access', 403);
+  }
+
+  // Get topper for the same exam (same testDate, course, batch)
+  const topperResult = await Result.findOne({
+    testDate: studentResult.testDate,
+    course: studentResult.course,
+    batch: studentResult.batch,
+    rank: 1
+  });
+
+  if (!topperResult) {
+    return errorResponse(res, 'Topper data not found for this exam', 404);
+  }
+
+  // Calculate percentages
+  const calculateAttemptPercent = (ta: number, tq: number) => (tq > 0 ? (ta / tq) * 100 : 0);
+  const calculateRightsPercent = (tr: number, ta: number) => (ta > 0 ? (tr / ta) * 100 : 0);
+  const calculateWrongPercent = (tw: number, ta: number) => (ta > 0 ? (tw / ta) * 100 : 0);
+
+  const comparisonData = {
+    examInfo: {
+      examDate: studentResult.testDate,
+      course: studentResult.course,
+      testType: studentResult.course.toLowerCase().includes('surprise') ? 'SURPRISE TEST' : 'CLASSROOM TEST-MEDICAL'
+    },
+    student: {
+      rollNo: studentResult.rollNo,
+      studentName: studentResult.studentName,
+      rank: studentResult.rank,
+      marksPercent: studentResult.marksPercentage,
+      attemptPercent: calculateAttemptPercent(studentResult.ta, studentResult.tq),
+      rightsPercent: calculateRightsPercent(studentResult.tr, studentResult.ta),
+      wrongPercent: calculateWrongPercent(studentResult.tw, studentResult.ta),
+      percentile: studentResult.percentile
+    },
+    topper: {
+      rollNo: topperResult.rollNo,
+      studentName: topperResult.studentName,
+      rank: topperResult.rank,
+      marksPercent: topperResult.marksPercentage,
+      attemptPercent: calculateAttemptPercent(topperResult.ta, topperResult.tq),
+      rightsPercent: calculateRightsPercent(topperResult.tr, topperResult.ta),
+      wrongPercent: calculateWrongPercent(topperResult.tw, topperResult.ta),
+      percentile: topperResult.percentile
+    }
+  };
+
+  successResponse(res, comparisonData);
+});
+
+// Get results by roll number and batch (for student result page)
+export const getResultsByRollNo = asyncHandler(async (req: Request, res: Response) => {
+  const { rollNo } = req.params;
+  const { batch } = req.query;
+
+  const query: any = { rollNo };
+  if (batch) {
+    query.batch = batch;
+  }
+
+  const results = await Result.find(query)
+    .sort({ testDate: -1 });
+
+  if (results.length === 0) {
+    return errorResponse(res, 'No results found for this roll number', 404);
+  }
+
+  // Get student info from first result
+  const studentInfo = {
+    rollNo: results[0].rollNo,
+    studentName: results[0].studentName,
+    course: results[0].course,
+    branch: results[0].branch
+  };
+
+  // Group results by test type (CLASSROOM TEST or SURPRISE TEST based on course name or test date pattern)
+  const classroomTests = results.filter(r => 
+    !r.course.toLowerCase().includes('surprise')
+  );
+  const surpriseTests = results.filter(r => 
+    r.course.toLowerCase().includes('surprise')
+  );
+
+  successResponse(res, {
+    studentInfo,
+    classroomTests,
+    surpriseTests,
+    allResults: results
+  });
 });
 
 // Export multer configuration
