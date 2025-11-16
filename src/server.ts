@@ -53,7 +53,7 @@ app.use(hpp());
 // CORS
 app.use(
   cors({
-    origin: ["https://goalinstitute.org", "https://admin.goalinstitute.com"],
+    origin: ["https://www.goalinstitute.org", "https://admin.goalinstitute.org"],
     credentials: true,
   })
 );
