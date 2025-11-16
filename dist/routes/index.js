@@ -16,6 +16,7 @@ const publicNotice_1 = __importDefault(require("./publicNotice"));
 const result_1 = __importDefault(require("./result"));
 const careerApplication_1 = __importDefault(require("./careerApplication"));
 const gvet_1 = __importDefault(require("./gvet"));
+const gaetResult_1 = __importDefault(require("./gaetResult"));
 const router = (0, express_1.Router)();
 // Mount routes
 router.use('/auth', auth_1.default);
@@ -30,6 +31,7 @@ router.use('/public-notice', publicNotice_1.default);
 router.use('/result', result_1.default);
 router.use('/career-applications', careerApplication_1.default);
 router.use('/gvet', gvet_1.default);
+router.use('/gaet-results', gaetResult_1.default);
 // Health check route
 router.get('/health', (req, res) => {
     res.status(200).json({

@@ -11,6 +11,7 @@ import publicNoticeRoutes from './publicNotice';
 import resultRoutes from './result';
 import careerApplicationRoutes from './careerApplication';
 import gvetRoutes from './gvet';
+import gaetResultRoutes from './gaetResult';
 
 const router = Router();
 
@@ -27,6 +28,7 @@ router.use('/public-notice', publicNoticeRoutes);
 router.use('/result', resultRoutes);
 router.use('/career-applications', careerApplicationRoutes);
 router.use('/gvet', gvetRoutes);
+router.use('/gaet-results', gaetResultRoutes);
 
 // Health check route
 router.get('/health', (req, res) => {
