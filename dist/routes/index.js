@@ -17,6 +17,9 @@ const result_1 = __importDefault(require("./result"));
 const careerApplication_1 = __importDefault(require("./careerApplication"));
 const gvet_1 = __importDefault(require("./gvet"));
 const gaetResult_1 = __importDefault(require("./gaetResult"));
+const gaetDate_1 = __importDefault(require("./gaetDate"));
+const aitsVideoSolution_1 = __importDefault(require("./aitsVideoSolution"));
+const course_1 = __importDefault(require("./course"));
 const router = (0, express_1.Router)();
 // Mount routes
 router.use('/auth', auth_1.default);
@@ -32,6 +35,9 @@ router.use('/result', result_1.default);
 router.use('/career-applications', careerApplication_1.default);
 router.use('/gvet', gvet_1.default);
 router.use('/gaet-results', gaetResult_1.default);
+router.use('/gaet-dates', gaetDate_1.default);
+router.use('/aits-video-solutions', aitsVideoSolution_1.default);
+router.use('/courses', course_1.default);
 // Health check route
 router.get('/health', (req, res) => {
     res.status(200).json({

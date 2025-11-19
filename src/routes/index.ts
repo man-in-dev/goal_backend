@@ -12,6 +12,9 @@ import resultRoutes from './result';
 import careerApplicationRoutes from './careerApplication';
 import gvetRoutes from './gvet';
 import gaetResultRoutes from './gaetResult';
+import gaetDateRoutes from './gaetDate';
+import aitsVideoSolutionRoutes from './aitsVideoSolution';
+import courseRoutes from './course';
 
 const router = Router();
 
@@ -29,6 +32,9 @@ router.use('/result', resultRoutes);
 router.use('/career-applications', careerApplicationRoutes);
 router.use('/gvet', gvetRoutes);
 router.use('/gaet-results', gaetResultRoutes);
+router.use('/gaet-dates', gaetDateRoutes);
+router.use('/aits-video-solutions', aitsVideoSolutionRoutes);
+router.use('/courses', courseRoutes);
 
 // Health check route
 router.get('/health', (req, res) => {
