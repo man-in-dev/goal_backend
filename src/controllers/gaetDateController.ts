@@ -17,12 +17,48 @@ export const getAllGAETDates = asyncHandler(async (req: AuthRequest, res: Respon
     filter.isActive = isActive === 'true';
   }
 
-  // Get all active dates sorted by date
-  const dates = await GAETDate.find(filter)
-    .sort({ date: 1, createdAt: -1 })
-    .lean();
+  // Get all dates
+  const dates = await GAETDate.find(filter).lean();
 
-  return successResponse(res, { dates }, 'GAET dates retrieved successfully');
+  // Helper function to parse date string to Date object
+  const parseDate = (dateStr: string): Date => {
+    // Try parsing as-is first (works for "June 15, 2026", "November 5, 2026", etc.)
+    let parsed = new Date(dateStr);
+    
+    // If that fails, try to handle "15 April 2023" format
+    if (isNaN(parsed.getTime())) {
+      // Try to reformat: "15 April 2023" -> "April 15, 2023"
+      const parts = dateStr.trim().split(/\s+/);
+      if (parts.length === 3) {
+        // Check if first part is a number (day)
+        if (/^\d+$/.test(parts[0])) {
+          parsed = new Date(`${parts[1]} ${parts[0]}, ${parts[2]}`);
+        }
+      }
+    }
+    
+    return parsed;
+  };
+
+  // Sort dates chronologically (November before December, etc.)
+  const sortedDates = dates.sort((a, b) => {
+    const dateA = parseDate(a.date);
+    const dateB = parseDate(b.date);
+    
+    // If dates are valid, sort by date (chronological order)
+    if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+      return dateA.getTime() - dateB.getTime();
+    }
+    
+    // If one is invalid, put it at the end
+    if (isNaN(dateA.getTime())) return 1;
+    if (isNaN(dateB.getTime())) return -1;
+    
+    // Fallback to createdAt if both dates are invalid
+    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+  });
+
+  return successResponse(res, { dates: sortedDates }, 'GAET dates retrieved successfully');
 });
 
 // @desc    Get single GAET date

@@ -33,8 +33,8 @@ router.get('/', getAllGAETDates);
 router.get('/:id', getGAETDateById);
 
 // Protected routes (Admin only)
-router.post('/', protect, authorize('admin'), gaetDateValidation, validateRequest, createGAETDate);
-router.put('/:id', protect, authorize('admin'), gaetDateValidation, validateRequest, updateGAETDate);
+router.post('/', protect, authorize('admin'), createGAETDate);
+router.put('/:id', protect, authorize('admin'), updateGAETDate);
 router.delete('/:id', protect, authorize('admin'), deleteGAETDate);
 
 export default router;
