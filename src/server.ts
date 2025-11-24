@@ -25,8 +25,51 @@ if (!fs.existsSync(uploadsDir)) {
 // Connect to database
 connectDB();
 
-// Security middleware
-app.use(helmet());
+// CORS Configuration - Must be before other middleware
+const allowedOrigins = process.env.CORS_ORIGIN 
+  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+  : [
+      "https://goalinstitute.org",
+      "https://www.goalinstitute.org",
+      "https://admin.goalinstitute.org",
+      "http://localhost:3000",
+      "http://localhost:3001",
+    ];
+
+// CORS middleware with detailed logging
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      // Check if origin is in allowed list
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        // Log the blocked origin for debugging
+        console.warn(`CORS blocked origin: ${origin}`);
+        console.log(`Allowed origins: ${allowedOrigins.join(', ')}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    maxAge: 86400, // 24 hours
+  })
+);
+
+// Security middleware - Configure helmet to not interfere with CORS
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginEmbedderPolicy: false,
+  })
+);
 
 // Rate limiting
 const limiter = rateLimit({
@@ -49,14 +92,6 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Prevent http param pollution
 app.use(hpp());
-
-// CORS
-app.use(
-  cors({
-    origin: ["https://goalinstitute.org", "https://admin.goalinstitute.org"],
-    credentials: true,
-  })
-);
 
 // Request logging middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -116,5 +151,5 @@ const PORT = EnvVariables.PORT;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port: ${PORT}`);
   console.log(`🌍 Environment: ${EnvVariables.NODE_ENV}`);
-  console.log(`🔗 CORS Origin: ${EnvVariables.CORS_ORIGIN}`);
+  console.log(`🔗 CORS Allowed Origins: ${allowedOrigins.join(', ')}`);
 });
