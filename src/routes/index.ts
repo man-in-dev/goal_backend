@@ -16,6 +16,7 @@ import gaetDateRoutes from './gaetDate';
 import aitsVideoSolutionRoutes from './aitsVideoSolution';
 import courseRoutes from './course';
 import paymentRoutes from './payment';
+import admissionFormRoutes from './admissionForm';
 
 const router = Router();
 
@@ -37,6 +38,7 @@ router.use('/gaet-dates', gaetDateRoutes);
 router.use('/aits-video-solutions', aitsVideoSolutionRoutes);
 router.use('/courses', courseRoutes);
 router.use('/payment', paymentRoutes);
+router.use('/admission-form', admissionFormRoutes);
 
 // Health check route
 router.get('/health', (req, res) => {

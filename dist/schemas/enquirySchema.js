@@ -119,6 +119,90 @@ exports.enquiryFormSchema = zod_1.z.object({
         .min(1, 'Preferred test centre is required')
         .max(200, 'Preferred test centre cannot exceed 200 characters')
         .trim(),
+    // Applicant Details
+    applicationNo: zod_1.z.string()
+        .max(50, 'Application number cannot exceed 50 characters')
+        .trim()
+        .optional(),
+    gender: zod_1.z.enum(['male', 'female', 'other'])
+        .optional(),
+    dateOfBirth: zod_1.z.string()
+        .trim()
+        .optional(),
+    placeOfBirth: zod_1.z.string()
+        .max(200, 'Place of birth cannot exceed 200 characters')
+        .trim()
+        .optional(),
+    category: zod_1.z.string()
+        .max(50, 'Category cannot exceed 50 characters')
+        .trim()
+        .optional(),
+    nationality: zod_1.z.string()
+        .max(100, 'Nationality cannot exceed 100 characters')
+        .trim()
+        .optional(),
+    motherTongue: zod_1.z.string()
+        .max(100, 'Mother tongue cannot exceed 100 characters')
+        .trim()
+        .optional(),
+    alternateContact: zod_1.z.string()
+        .regex(/^[0-9]{10}$/, 'Please provide a valid 10-digit phone number')
+        .trim()
+        .optional(),
+    pinCode: zod_1.z.string()
+        .max(10, 'Pin code cannot exceed 10 characters')
+        .trim()
+        .optional(),
+    passportPhoto: zod_1.z.string()
+        .trim()
+        .optional(),
+    // Guardian Details
+    guardianName: zod_1.z.string()
+        .max(100, 'Guardian name cannot exceed 100 characters')
+        .trim()
+        .optional(),
+    guardianMobile: zod_1.z.string()
+        .regex(/^[0-9]{10}$/, 'Please provide a valid 10-digit phone number')
+        .trim()
+        .optional(),
+    guardianWhatsApp: zod_1.z.string()
+        .regex(/^[0-9]{10}$/, 'Please provide a valid 10-digit phone number')
+        .trim()
+        .optional(),
+    guardianRelationship: zod_1.z.string()
+        .max(100, 'Guardian relationship cannot exceed 100 characters')
+        .trim()
+        .optional(),
+    // Additional Academic Fields
+    previousGrade: zod_1.z.string()
+        .max(10, 'Previous grade cannot exceed 10 characters')
+        .trim()
+        .optional(),
+    classSeekingAdmission: zod_1.z.string()
+        .max(50, 'Class seeking admission cannot exceed 50 characters')
+        .trim()
+        .optional(),
+    // Documents
+    reportCard: zod_1.z.string()
+        .trim()
+        .optional(),
+    birthCertificate: zod_1.z.string()
+        .trim()
+        .optional(),
+    idProof: zod_1.z.string()
+        .trim()
+        .optional(),
+    // Declaration
+    declarationAccepted: zod_1.z.boolean()
+        .optional()
+        .default(false),
+    parentGuardianName: zod_1.z.string()
+        .max(100, 'Parent/Guardian name cannot exceed 100 characters')
+        .trim()
+        .optional(),
+    declarationDate: zod_1.z.string()
+        .trim()
+        .optional(),
     status: zod_1.z.enum(['pending', 'contacted', 'resolved', 'closed'])
         .optional()
         .default('pending')

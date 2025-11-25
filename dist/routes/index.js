@@ -21,6 +21,7 @@ const gaetDate_1 = __importDefault(require("./gaetDate"));
 const aitsVideoSolution_1 = __importDefault(require("./aitsVideoSolution"));
 const course_1 = __importDefault(require("./course"));
 const payment_1 = __importDefault(require("./payment"));
+const admissionForm_1 = __importDefault(require("./admissionForm"));
 const router = (0, express_1.Router)();
 // Mount routes
 router.use('/auth', auth_1.default);
@@ -40,6 +41,7 @@ router.use('/gaet-dates', gaetDate_1.default);
 router.use('/aits-video-solutions', aitsVideoSolution_1.default);
 router.use('/courses', course_1.default);
 router.use('/payment', payment_1.default);
+router.use('/admission-form', admissionForm_1.default);
 // Health check route
 router.get('/health', (req, res) => {
     res.status(200).json({

@@ -18,15 +18,56 @@ const db_1 = __importDefault(require("./config/db"));
 const routes_1 = __importDefault(require("./routes"));
 const errorHandler_1 = require("./middleware/errorHandler");
 const app = (0, express_1.default)();
-// Create uploads directory if it doesn't exist
-const uploadsDir = path_1.default.join(__dirname, 'uploads', 'resumes');
-if (!fs_1.default.existsSync(uploadsDir)) {
-    fs_1.default.mkdirSync(uploadsDir, { recursive: true });
+// Create uploads directories if they don't exist
+const resumesDir = path_1.default.join(__dirname, 'uploads', 'resumes');
+const admissionFormsDir = path_1.default.join(__dirname, 'uploads', 'admission-forms');
+if (!fs_1.default.existsSync(resumesDir)) {
+    fs_1.default.mkdirSync(resumesDir, { recursive: true });
+}
+if (!fs_1.default.existsSync(admissionFormsDir)) {
+    fs_1.default.mkdirSync(admissionFormsDir, { recursive: true });
 }
 // Connect to database
 (0, db_1.default)();
-// Security middleware
-app.use((0, helmet_1.default)());
+// CORS Configuration - Must be before other middleware
+const allowedOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+    : [
+        // "https://goalinstitute.org",
+        // "https://www.goalinstitute.org",
+        // "https://admin.goalinstitute.org",
+        "http://localhost:3000",
+        "http://localhost:3001",
+    ];
+// CORS middleware with detailed logging
+app.use((0, cors_1.default)({
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) {
+            return callback(null, true);
+        }
+        // Check if origin is in allowed list
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        }
+        else {
+            // Log the blocked origin for debugging
+            console.warn(`CORS blocked origin: ${origin}`);
+            console.log(`Allowed origins: ${allowedOrigins.join(', ')}`);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    maxAge: 86400, // 24 hours
+}));
+// Security middleware - Configure helmet to not interfere with CORS
+app.use((0, helmet_1.default)({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginEmbedderPolicy: false,
+}));
 // Rate limiting
 const limiter = (0, express_rate_limit_1.default)({
     windowMs: 10 * 60 * 1000, // 10 minutes
@@ -43,11 +84,6 @@ app.use(express_1.default.urlencoded({ extended: true, limit: "10mb" }));
 // app.use(xss());
 // Prevent http param pollution
 app.use((0, hpp_1.default)());
-// CORS
-app.use((0, cors_1.default)({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
-    credentials: true,
-}));
 // Request logging middleware
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
@@ -95,6 +131,6 @@ const PORT = envConfig_1.default.PORT;
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on port: ${PORT}`);
     console.log(`🌍 Environment: ${envConfig_1.default.NODE_ENV}`);
-    console.log(`🔗 CORS Origin: ${envConfig_1.default.CORS_ORIGIN}`);
+    console.log(`🔗 CORS Allowed Origins: ${allowedOrigins.join(', ')}`);
 });
 //# sourceMappingURL=server.js.map

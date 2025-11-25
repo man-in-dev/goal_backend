@@ -144,7 +144,113 @@ export const enquiryFormSchema = z.object({
     .min(1, 'Preferred test centre is required')
     .max(200, 'Preferred test centre cannot exceed 200 characters')
     .trim(),
-  
+
+  // Applicant Details
+  applicationNo: z.string()
+    .max(50, 'Application number cannot exceed 50 characters')
+    .trim()
+    .optional(),
+
+  gender: z.enum(['male', 'female', 'other'])
+    .optional(),
+
+  dateOfBirth: z.string()
+    .trim()
+    .optional(),
+
+  placeOfBirth: z.string()
+    .max(200, 'Place of birth cannot exceed 200 characters')
+    .trim()
+    .optional(),
+
+  category: z.string()
+    .max(50, 'Category cannot exceed 50 characters')
+    .trim()
+    .optional(),
+
+  nationality: z.string()
+    .max(100, 'Nationality cannot exceed 100 characters')
+    .trim()
+    .optional(),
+
+  motherTongue: z.string()
+    .max(100, 'Mother tongue cannot exceed 100 characters')
+    .trim()
+    .optional(),
+
+  alternateContact: z.string()
+    .regex(/^[0-9]{10}$/, 'Please provide a valid 10-digit phone number')
+    .trim()
+    .optional(),
+
+  pinCode: z.string()
+    .max(10, 'Pin code cannot exceed 10 characters')
+    .trim()
+    .optional(),
+
+  passportPhoto: z.string()
+    .trim()
+    .optional(),
+
+  // Guardian Details
+  guardianName: z.string()
+    .max(100, 'Guardian name cannot exceed 100 characters')
+    .trim()
+    .optional(),
+
+  guardianMobile: z.string()
+    .regex(/^[0-9]{10}$/, 'Please provide a valid 10-digit phone number')
+    .trim()
+    .optional(),
+
+  guardianWhatsApp: z.string()
+    .regex(/^[0-9]{10}$/, 'Please provide a valid 10-digit phone number')
+    .trim()
+    .optional(),
+
+  guardianRelationship: z.string()
+    .max(100, 'Guardian relationship cannot exceed 100 characters')
+    .trim()
+    .optional(),
+
+  // Additional Academic Fields
+  previousGrade: z.string()
+    .max(10, 'Previous grade cannot exceed 10 characters')
+    .trim()
+    .optional(),
+
+  classSeekingAdmission: z.string()
+    .max(50, 'Class seeking admission cannot exceed 50 characters')
+    .trim()
+    .optional(),
+
+  // Documents
+  reportCard: z.string()
+    .trim()
+    .optional(),
+
+  birthCertificate: z.string()
+    .trim()
+    .optional(),
+
+  idProof: z.string()
+    .trim()
+    .optional(),
+
+  // Declaration
+  declarationAccepted: z.boolean()
+    .optional()
+    .default(false),
+
+  parentGuardianName: z.string()
+    .max(100, 'Parent/Guardian name cannot exceed 100 characters')
+    .trim()
+    .optional(),
+
+  declarationDate: z.string()
+    .trim()
+    .optional(),
+
   status: z.enum(['pending', 'contacted', 'resolved', 'closed'])
     .optional()
     .default('pending')

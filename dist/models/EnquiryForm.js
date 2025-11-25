@@ -207,6 +207,137 @@ const enquiryFormSchema = new mongoose_1.Schema({
         trim: true,
         maxlength: [200, 'Preferred test centre cannot exceed 200 characters']
     },
+    // Applicant Details
+    applicationNo: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [50, 'Application number cannot exceed 50 characters']
+    },
+    gender: {
+        type: String,
+        required: false,
+        trim: true,
+        enum: ['male', 'female', 'other'],
+        maxlength: [20, 'Gender cannot exceed 20 characters']
+    },
+    dateOfBirth: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    placeOfBirth: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [200, 'Place of birth cannot exceed 200 characters']
+    },
+    category: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [50, 'Category cannot exceed 50 characters']
+    },
+    nationality: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [100, 'Nationality cannot exceed 100 characters']
+    },
+    motherTongue: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [100, 'Mother tongue cannot exceed 100 characters']
+    },
+    alternateContact: {
+        type: String,
+        required: false,
+        trim: true,
+        match: [/^[0-9]{10}$/, 'Please enter a valid 10-digit phone number']
+    },
+    pinCode: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [10, 'Pin code cannot exceed 10 characters']
+    },
+    passportPhoto: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    // Guardian Details
+    guardianName: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [100, 'Guardian name cannot exceed 100 characters']
+    },
+    guardianMobile: {
+        type: String,
+        required: false,
+        trim: true,
+        match: [/^[0-9]{10}$/, 'Please enter a valid 10-digit phone number']
+    },
+    guardianWhatsApp: {
+        type: String,
+        required: false,
+        trim: true,
+        match: [/^[0-9]{10}$/, 'Please enter a valid 10-digit phone number']
+    },
+    guardianRelationship: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [100, 'Guardian relationship cannot exceed 100 characters']
+    },
+    // Additional Academic Fields
+    previousGrade: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [10, 'Previous grade cannot exceed 10 characters']
+    },
+    classSeekingAdmission: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [50, 'Class seeking admission cannot exceed 50 characters']
+    },
+    // Documents
+    reportCard: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    birthCertificate: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    idProof: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    // Declaration
+    declarationAccepted: {
+        type: Boolean,
+        required: false,
+        default: false
+    },
+    parentGuardianName: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [100, 'Parent/Guardian name cannot exceed 100 characters']
+    },
+    declarationDate: {
+        type: String,
+        required: false,
+        trim: true
+    },
     status: {
         type: String,
         enum: ['pending', 'contacted', 'resolved', 'closed'],
