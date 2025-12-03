@@ -64,15 +64,15 @@ const publicNoticeValidation = [
 
 // Public routes
 router.get('/', getAllPublicNotices);
-router.get('/stats', protect, authorize('admin'), getPublicNoticeStats);
+router.get('/stats', protect, authorize('admin', 'event_publisher'), getPublicNoticeStats);
 router.get('/:id', getPublicNoticeById);
 
-// Protected routes (Admin only)
-// router.post('/', protect, authorize('admin'), publicNoticeValidation, validateRequest, createPublicNotice);
-router.post('/', createPublicNotice);
-router.put('/:id', updatePublicNotice);
-// router.put('/:id', protect, authorize('admin'), publicNoticeValidation, validateRequest, updatePublicNotice);
-router.delete('/:id', protect, authorize('admin'), deletePublicNotice);
+// Protected routes (Admin + Event Publisher)
+// router.post('/', protect, authorize('admin', 'event_publisher'), publicNoticeValidation, validateRequest, createPublicNotice);
+router.post('/', protect, authorize('admin', 'event_publisher'), createPublicNotice);
+router.put('/:id', protect, authorize('admin', 'event_publisher'), updatePublicNotice);
+// router.put('/:id', protect, authorize('admin', 'event_publisher'), publicNoticeValidation, validateRequest, updatePublicNotice);
+router.delete('/:id', protect, authorize('admin', 'event_publisher'), deletePublicNotice);
 
 export default router;
 

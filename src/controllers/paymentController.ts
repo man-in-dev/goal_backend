@@ -3,9 +3,11 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { ApiResponse } from "../utils/response";
 import { logger } from "../utils/logger";
 import { PaymentService } from "../services/paymentService";
+import { PhiCommerceService } from "../services/phicommerceService";
 import { CustomError } from "../middleware/errorHandler";
 import EnquiryForm from "../models/EnquiryForm";
 import AdmissionEnquiry from "../models/AdmissionEnquiry";
+import AdmissionForm from "../models/AdmissionForm";
 
 // @desc    Initiate payment for admission form
 // @route   POST /api/payment/initiate
@@ -22,9 +24,15 @@ export const initiatePayment = asyncHandler(
       throw new CustomError("Amount must be greater than 0", 400);
     }
 
-    // Try to find enquiry in EnquiryForm first (most common)
-    let enquiry = await EnquiryForm.findById(enquiryId);
-    let enquiryType = 'EnquiryForm';
+    // Try to find enquiry in AdmissionForm first (for online admission form)
+    let enquiry: any = await AdmissionForm.findById(enquiryId);
+    let enquiryType = 'AdmissionForm';
+
+    // If not found, try EnquiryForm
+    if (!enquiry) {
+      enquiry = await EnquiryForm.findById(enquiryId);
+      enquiryType = 'EnquiryForm';
+    }
 
     // If not found, try AdmissionEnquiry
     if (!enquiry) {
@@ -33,42 +41,36 @@ export const initiatePayment = asyncHandler(
     }
 
     if (!enquiry) {
-      logger.error("Enquiry not found", { enquiryId, triedModels: ['EnquiryForm', 'AdmissionEnquiry'] });
+      logger.error("Enquiry not found", { enquiryId, triedModels: ['AdmissionForm', 'EnquiryForm', 'AdmissionEnquiry'] });
       throw new CustomError("Enquiry not found", 404);
     }
 
     logger.info("Enquiry found for payment", { enquiryId, enquiryType });
 
-    // Check if payment already exists for this enquiry
-    const existingPayment = await PaymentService.getPaymentByEnquiryId(enquiryId);
-    if (existingPayment && existingPayment.status === 'success') {
-      throw new CustomError("Payment already completed for this enquiry", 400);
-    }
-
-    // Extract enquiry data (handle both models)
+    // Extract enquiry data (handle all models)
     const studentName = enquiry.name;
-    const studentEmail = enquiry.email || '';
+    const studentEmail = enquiry.email || 'guest@phicommerce.com';
     const studentPhone = enquiry.phone;
-    const course = enquiry.course || 'General Admission';
+    const course = enquiry.course || enquiry.classSeekingAdmission || 'General Admission';
 
-    // Initiate payment
-    const paymentData = await PaymentService.initiatePayment(enquiryId, {
+    // Use PhiCommerce for payment initiation
+    const paymentResult = await PhiCommerceService.initiatePayment({
+      enquiryId,
       amount: parseFloat(amount),
-      studentName,
-      studentEmail,
-      studentPhone,
-      course
+      customerName: studentName,
+      customerEmail: studentEmail,
+      customerMobile: studentPhone,
+      addlParam1: `Enquiry_${enquiryId}`,
+      addlParam2: course
     });
 
     ApiResponse.success(
       res,
       {
-        paymentId: paymentData.payment._id,
-        transactionId: paymentData.payment.transactionId,
-        orderId: paymentData.payment.orderId,
-        amount: paymentData.payment.amount,
-        paymentUrl: paymentData.paymentUrl,
-        paymentParams: paymentData.paymentParams
+        merchantTxnNo: paymentResult.merchantTxnNo,
+        amount: parseFloat(amount),
+        paymentUrl: paymentResult.redirectUrl,
+        tranCtx: paymentResult.tranCtx
       },
       "Payment initiated successfully",
       200
@@ -76,7 +78,7 @@ export const initiatePayment = asyncHandler(
   }
 );
 
-// @desc    Handle payment callback from ICICI Eazypay
+// @desc    Handle payment callback from payment gateway
 // @route   POST /api/payment/callback
 // @route   GET /api/payment/callback
 // @access  Public
@@ -84,25 +86,40 @@ export const handlePaymentCallback = asyncHandler(
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     logger.info("Payment callback received", { body: req.body, query: req.query });
 
-    // ICICI Eazypay may send data via POST body or GET query parameters
+    // Payment gateway may send data via POST body or GET query parameters
     const callbackData = Object.keys(req.body).length > 0 ? req.body : req.query;
 
     try {
-      const payment = await PaymentService.handlePaymentCallback(callbackData);
+      // Handle PhiCommerce callback
+      const paymentResult = PhiCommerceService.handlePaymentCallback(callbackData);
 
-      // Update enquiry status if payment is successful
-      if (payment.status === 'success') {
-        // Try to update EnquiryForm first
-        let updated = await EnquiryForm.findByIdAndUpdate(
-          payment.enquiryId,
-          { status: 'contacted' },
+      // Extract enquiry ID from addlParam1 (format: "Enquiry_<id>")
+      const addlParam1 = callbackData.addlParam1 || '';
+      const enquiryIdMatch = addlParam1.match(/Enquiry_(.+)/);
+      const enquiryId = enquiryIdMatch ? enquiryIdMatch[1] : null;
+
+      // Update enquiry status if payment is successful and enquiry ID is found
+      if (paymentResult.status === 'success' && enquiryId) {
+        // Try to update AdmissionForm first
+        let updated = await AdmissionForm.findByIdAndUpdate(
+          enquiryId,
+          { status: 'under_review' },
           { new: true }
         );
+
+        // If not found, try EnquiryForm
+        if (!updated) {
+          updated = await EnquiryForm.findByIdAndUpdate(
+            enquiryId,
+            { status: 'contacted' },
+            { new: true }
+          );
+        }
 
         // If not found, try AdmissionEnquiry
         if (!updated) {
           updated = await AdmissionEnquiry.findByIdAndUpdate(
-            payment.enquiryId,
+            enquiryId,
             { status: 'enrolled' },
             { new: true }
           );
@@ -111,9 +128,9 @@ export const handlePaymentCallback = asyncHandler(
 
       // Redirect to frontend success/failure page
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      const redirectUrl = payment.status === 'success'
-        ? `${frontendUrl}/payment/success?transactionId=${payment.transactionId}`
-        : `${frontendUrl}/payment/failure?transactionId=${payment.transactionId}`;
+      const redirectUrl = paymentResult.status === 'success'
+        ? `${frontendUrl}/payment/success?transactionId=${paymentResult.merchantTxnNo}`
+        : `${frontendUrl}/payment/failure?transactionId=${paymentResult.merchantTxnNo}&error=${encodeURIComponent(paymentResult.respdescription || 'Payment failed')}`;
 
       res.redirect(redirectUrl);
     } catch (error) {

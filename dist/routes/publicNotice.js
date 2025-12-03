@@ -58,13 +58,13 @@ const publicNoticeValidation = [
 ];
 // Public routes
 router.get('/', publicNoticeController_1.getAllPublicNotices);
-router.get('/stats', auth_1.protect, (0, auth_1.authorize)('admin'), publicNoticeController_1.getPublicNoticeStats);
+router.get('/stats', auth_1.protect, (0, auth_1.authorize)('admin', 'event_publisher'), publicNoticeController_1.getPublicNoticeStats);
 router.get('/:id', publicNoticeController_1.getPublicNoticeById);
-// Protected routes (Admin only)
-// router.post('/', protect, authorize('admin'), publicNoticeValidation, validateRequest, createPublicNotice);
-router.post('/', publicNoticeController_1.createPublicNotice);
-router.put('/:id', publicNoticeController_1.updatePublicNotice);
-// router.put('/:id', protect, authorize('admin'), publicNoticeValidation, validateRequest, updatePublicNotice);
-router.delete('/:id', auth_1.protect, (0, auth_1.authorize)('admin'), publicNoticeController_1.deletePublicNotice);
+// Protected routes (Admin + Event Publisher)
+// router.post('/', protect, authorize('admin', 'event_publisher'), publicNoticeValidation, validateRequest, createPublicNotice);
+router.post('/', auth_1.protect, (0, auth_1.authorize)('admin', 'event_publisher'), publicNoticeController_1.createPublicNotice);
+router.put('/:id', auth_1.protect, (0, auth_1.authorize)('admin', 'event_publisher'), publicNoticeController_1.updatePublicNotice);
+// router.put('/:id', protect, authorize('admin', 'event_publisher'), publicNoticeValidation, validateRequest, updatePublicNotice);
+router.delete('/:id', auth_1.protect, (0, auth_1.authorize)('admin', 'event_publisher'), publicNoticeController_1.deletePublicNotice);
 exports.default = router;
 //# sourceMappingURL=publicNotice.js.map

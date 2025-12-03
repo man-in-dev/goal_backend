@@ -7,7 +7,11 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  role: 'user' | 'admin';
+  // Available roles in the system
+  // - 'user': regular authenticated user
+  // - 'admin': full administrative access
+  // - 'event_publisher': can manage news & events content
+  role: 'user' | 'admin' | 'event_publisher';
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -39,7 +43,7 @@ const UserSchema = new Schema<IUser>({
   },
   role: {
     type: String,
-    enum: ['user', 'admin'],
+    enum: ['user', 'admin', 'event_publisher'],
     default: 'user'
   },
   isActive: {

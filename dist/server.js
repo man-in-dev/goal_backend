@@ -33,9 +33,9 @@ if (!fs_1.default.existsSync(admissionFormsDir)) {
 const allowedOrigins = process.env.CORS_ORIGIN
     ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
     : [
-        // "https://goalinstitute.org",
-        // "https://www.goalinstitute.org",
-        // "https://admin.goalinstitute.org",
+        "https://goalinstitute.org",
+        "https://www.goalinstitute.org",
+        "https://admin.goalinstitute.org",
         "http://localhost:3000",
         "http://localhost:3001",
     ];

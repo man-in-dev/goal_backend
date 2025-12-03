@@ -1,4 +1,5 @@
 import { Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 import PublicNotice, { IPublicNotice } from '../models/PublicNotice';
 import { successResponse, errorResponse } from '../utils/response';
 import { asyncHandler } from '../utils/asyncHandler';
@@ -133,10 +134,21 @@ export const deletePublicNotice = asyncHandler(async (req: AuthRequest, res: Res
 
 // @desc    Get public notice statistics
 // @route   GET /api/public-notices/stats
-// @access  Private (Admin only)
+// @access  Private (Admin + Event Publisher)
 export const getPublicNoticeStats = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
+    // If the user is an event_publisher, limit stats to notices they created.
+    // Admin users continue to see global stats.
+    const matchStage: any[] = [];
+
+    if (req.user?.role === 'event_publisher' && req.user.id) {
+      matchStage.push({
+        $match: { createdBy: new mongoose.Types.ObjectId(req.user.id) }
+      });
+    }
+
     const stats = await PublicNotice.aggregate([
+      ...matchStage,
       {
         $group: {
           _id: null,
@@ -163,6 +175,7 @@ export const getPublicNoticeStats = asyncHandler(async (req: AuthRequest, res: R
 
     // Get category stats separately
     const categoryStats = await PublicNotice.aggregate([
+      ...matchStage,
       {
         $group: {
           _id: '$category',
@@ -179,6 +192,7 @@ export const getPublicNoticeStats = asyncHandler(async (req: AuthRequest, res: R
 
     // Get priority stats separately
     const priorityStats = await PublicNotice.aggregate([
+      ...matchStage,
       {
         $group: {
           _id: '$priority',

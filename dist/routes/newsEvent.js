@@ -60,7 +60,8 @@ router.get('/tags', newsEventController_1.getNewsEventsByTags);
 router.post('/:id/like', newsEventController_1.toggleNewsEventLike);
 router.post('/:id/share', newsEventController_1.incrementNewsEventShare);
 // Protected routes (for admin dashboard)
-router.use(auth_1.authenticateToken);
+// Only admin and event_publisher roles can manage news & events
+router.use(auth_1.protect, (0, auth_1.authorize)('admin', 'event_publisher'));
 router.get('/stats', newsEventController_1.getNewsEventStats);
 router.get('/:id', newsEventController_1.getNewsEventById);
 // router.post('/', createNewsEventValidation, validateRequest, createNewsEvent);

@@ -31,6 +31,7 @@ const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
         const decoded = jsonwebtoken_1.default.verify(token, envConfig_1.default.JWT_SECRET);
         console.log('Auth middleware: Token decoded successfully:', decoded);
         req.user = decoded;
+        console.log('Auth middleware: User:', req.user);
         next();
     }
     catch (error) {

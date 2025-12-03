@@ -11,7 +11,7 @@ import {
   toggleNewsEventLike,
   incrementNewsEventShare
 } from '../controllers/newsEventController';
-import { authenticateToken } from '../middleware/auth';
+import { protect, authorize } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
 import { body } from 'express-validator';
 
@@ -72,7 +72,8 @@ router.post('/:id/like', toggleNewsEventLike);
 router.post('/:id/share', incrementNewsEventShare);
 
 // Protected routes (for admin dashboard)
-router.use(authenticateToken);
+// Only admin and event_publisher roles can manage news & events
+router.use(protect, authorize('admin', 'event_publisher'));
 router.get('/stats', getNewsEventStats);
 router.get('/:id', getNewsEventById);
 // router.post('/', createNewsEventValidation, validateRequest, createNewsEvent);

@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPublicNoticeStats = exports.deletePublicNotice = exports.updatePublicNotice = exports.createPublicNotice = exports.getPublicNoticeById = exports.getAllPublicNotices = void 0;
+const mongoose_1 = __importDefault(require("mongoose"));
 const PublicNotice_1 = __importDefault(require("../models/PublicNotice"));
 const response_1 = require("../utils/response");
 const asyncHandler_1 = require("../utils/asyncHandler");
@@ -105,10 +106,20 @@ exports.deletePublicNotice = (0, asyncHandler_1.asyncHandler)((req, res, next) =
 }));
 // @desc    Get public notice statistics
 // @route   GET /api/public-notices/stats
-// @access  Private (Admin only)
+// @access  Private (Admin + Event Publisher)
 exports.getPublicNoticeStats = (0, asyncHandler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
+        // If the user is an event_publisher, limit stats to notices they created.
+        // Admin users continue to see global stats.
+        const matchStage = [];
+        if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) === 'event_publisher' && req.user.id) {
+            matchStage.push({
+                $match: { createdBy: new mongoose_1.default.Types.ObjectId(req.user.id) }
+            });
+        }
         const stats = yield PublicNotice_1.default.aggregate([
+            ...matchStage,
             {
                 $group: {
                     _id: null,
@@ -134,6 +145,7 @@ exports.getPublicNoticeStats = (0, asyncHandler_1.asyncHandler)((req, res, next)
         ]);
         // Get category stats separately
         const categoryStats = yield PublicNotice_1.default.aggregate([
+            ...matchStage,
             {
                 $group: {
                     _id: '$category',
@@ -149,6 +161,7 @@ exports.getPublicNoticeStats = (0, asyncHandler_1.asyncHandler)((req, res, next)
         ]);
         // Get priority stats separately
         const priorityStats = yield PublicNotice_1.default.aggregate([
+            ...matchStage,
             {
                 $group: {
                     _id: '$priority',

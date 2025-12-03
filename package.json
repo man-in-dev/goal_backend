@@ -8,7 +8,8 @@
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed:aits": "ts-node seed-aits-data.ts",
-    "seed:gaet-dates": "ts-node seed-gaet-dates.ts"
+    "seed:gaet-dates": "ts-node seed-gaet-dates.ts",
+    "seed:event-publisher": "ts-node ./seed-event-publisher.ts"
   },
   "keywords": [],
   "author": "",

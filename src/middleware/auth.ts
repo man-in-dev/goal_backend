@@ -31,6 +31,7 @@ export const protect = async (
     const decoded = jwt.verify(token, EnvVariables.JWT_SECRET);
     console.log('Auth middleware: Token decoded successfully:', decoded);
     req.user = decoded;
+    console.log('Auth middleware: User:', req.user);
     next();
   } catch (error) {
     console.log('Auth middleware: Token verification failed:', error);
