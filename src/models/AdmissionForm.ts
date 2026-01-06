@@ -44,7 +44,7 @@ export interface IAdmissionForm extends Document {
   classSeekingAdmission: string;
   
   // Test Preferences
-  // preferredTestDate: string;
+  preferredTestDate: string;
   preferredTestCentre: string;
   
   // Documents
@@ -277,11 +277,11 @@ const admissionFormSchema = new Schema<IAdmissionForm>({
   },
   
   // Test Preferences
-  // preferredTestDate: {
-  //   type: String,
-  //   required: [true, 'Preferred entrance test date is required'],
-  //   trim: true
-  // },
+  preferredTestDate: {
+    type: String,
+    required: [true, 'Preferred entrance test date is required'],
+    trim: true
+  },
   preferredTestCentre: {
     type: String,
     required: [true, 'Preferred test centre is required'],
