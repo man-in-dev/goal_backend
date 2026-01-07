@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// Enquiry form validation schema
+// Enquiry form validation schema - Basic enquiry fields only
 export const enquiryFormSchema = z.object({
   name: z.string()
     .min(1, 'Name is required')
@@ -13,10 +13,10 @@ export const enquiryFormSchema = z.object({
     .trim(),
   
   email: z.string()
-    .min(1, 'Email is required')
     .email('Please provide a valid email')
     .toLowerCase()
-    .trim(),
+    .trim()
+    .optional(),
   
   studying: z.string()
     .min(1, 'Current class/studying is required')
@@ -44,9 +44,9 @@ export const enquiryFormSchema = z.object({
     .trim(),
   
   address: z.string()
-    .min(1, 'Address is required')
     .max(500, 'Address cannot exceed 500 characters')
-    .trim(),
+    .trim()
+    .optional(),
   
   query: z.string()
     .max(1000, 'Query cannot exceed 1000 characters')
@@ -68,189 +68,6 @@ export const enquiryFormSchema = z.object({
     .trim()
     .optional(),
   
-  // Parent/Guardian details
-  fatherName: z.string()
-    .min(1, 'Father\'s name is required')
-    .max(100, 'Father\'s name cannot exceed 100 characters')
-    .trim(),
-  
-  fatherMobile: z.string()
-    .min(1, 'Father\'s mobile number is required')
-    .regex(/^[0-9]{10}$/, 'Please provide a valid 10-digit phone number')
-    .trim(),
-  
-  fatherWhatsApp: z.string()
-    .min(1, 'Father\'s WhatsApp number is required')
-    .regex(/^[0-9]{10}$/, 'Please provide a valid 10-digit phone number')
-    .trim(),
-  
-  fatherOccupation: z.string()
-    .min(1, 'Father\'s occupation is required')
-    .max(100, 'Father\'s occupation cannot exceed 100 characters')
-    .trim(),
-  
-  motherName: z.string()
-    .min(1, 'Mother\'s name is required')
-    .max(100, 'Mother\'s name cannot exceed 100 characters')
-    .trim(),
-  
-  motherMobile: z.string()
-    .min(1, 'Mother\'s mobile number is required')
-    .regex(/^[0-9]{10}$/, 'Please provide a valid 10-digit phone number')
-    .trim(),
-  
-  motherOccupation: z.string()
-    .min(1, 'Mother\'s occupation is required')
-    .max(100, 'Mother\'s occupation cannot exceed 100 characters')
-    .trim(),
-  
-  annualFamilyIncome: z.string()
-    .min(1, 'Annual family income is required')
-    .max(50, 'Annual family income cannot exceed 50 characters')
-    .trim(),
-  
-  // Academic Records
-  previousClass: z.string()
-    .min(1, 'Previous class is required')
-    .max(50, 'Previous class cannot exceed 50 characters')
-    .trim(),
-  
-  previousSchool: z.string()
-    .min(1, 'Previous school name is required')
-    .max(200, 'Previous school name cannot exceed 200 characters')
-    .trim(),
-  
-  previousBoard: z.string()
-    .min(1, 'Board is required')
-    .max(100, 'Board cannot exceed 100 characters')
-    .trim(),
-  
-  previousYear: z.string()
-    .min(1, 'Year of passing is required')
-    .max(10, 'Year of passing cannot exceed 10 characters')
-    .trim(),
-  
-  previousMarks: z.string()
-    .min(1, 'Percentage marks is required')
-    .max(10, 'Percentage marks cannot exceed 10 characters')
-    .trim(),
-  
-  // Test Preferences
-  preferredTestDate: z.string()
-    .min(1, 'Preferred entrance test date is required')
-    .trim(),
-  
-  preferredTestCentre: z.string()
-    .min(1, 'Preferred test centre is required')
-    .max(200, 'Preferred test centre cannot exceed 200 characters')
-    .trim(),
-
-  // Applicant Details
-  applicationNo: z.string()
-    .max(50, 'Application number cannot exceed 50 characters')
-    .trim()
-    .optional(),
-
-  gender: z.enum(['male', 'female', 'other'])
-    .optional(),
-
-  dateOfBirth: z.string()
-    .trim()
-    .optional(),
-
-  placeOfBirth: z.string()
-    .max(200, 'Place of birth cannot exceed 200 characters')
-    .trim()
-    .optional(),
-
-  category: z.string()
-    .max(50, 'Category cannot exceed 50 characters')
-    .trim()
-    .optional(),
-
-  nationality: z.string()
-    .max(100, 'Nationality cannot exceed 100 characters')
-    .trim()
-    .optional(),
-
-  motherTongue: z.string()
-    .max(100, 'Mother tongue cannot exceed 100 characters')
-    .trim()
-    .optional(),
-
-  alternateContact: z.string()
-    .regex(/^[0-9]{10}$/, 'Please provide a valid 10-digit phone number')
-    .trim()
-    .optional(),
-
-  pinCode: z.string()
-    .max(10, 'Pin code cannot exceed 10 characters')
-    .trim()
-    .optional(),
-
-  passportPhoto: z.string()
-    .trim()
-    .optional(),
-
-  // Guardian Details
-  guardianName: z.string()
-    .max(100, 'Guardian name cannot exceed 100 characters')
-    .trim()
-    .optional(),
-
-  guardianMobile: z.string()
-    .regex(/^[0-9]{10}$/, 'Please provide a valid 10-digit phone number')
-    .trim()
-    .optional(),
-
-  guardianWhatsApp: z.string()
-    .regex(/^[0-9]{10}$/, 'Please provide a valid 10-digit phone number')
-    .trim()
-    .optional(),
-
-  guardianRelationship: z.string()
-    .max(100, 'Guardian relationship cannot exceed 100 characters')
-    .trim()
-    .optional(),
-
-  // Additional Academic Fields
-  previousGrade: z.string()
-    .max(10, 'Previous grade cannot exceed 10 characters')
-    .trim()
-    .optional(),
-
-  classSeekingAdmission: z.string()
-    .max(50, 'Class seeking admission cannot exceed 50 characters')
-    .trim()
-    .optional(),
-
-  // Documents
-  reportCard: z.string()
-    .trim()
-    .optional(),
-
-  birthCertificate: z.string()
-    .trim()
-    .optional(),
-
-  idProof: z.string()
-    .trim()
-    .optional(),
-
-  // Declaration
-  declarationAccepted: z.boolean()
-    .optional()
-    .default(false),
-
-  parentGuardianName: z.string()
-    .max(100, 'Parent/Guardian name cannot exceed 100 characters')
-    .trim()
-    .optional(),
-
-  declarationDate: z.string()
-    .trim()
-    .optional(),
-
   status: z.enum(['pending', 'contacted', 'resolved', 'closed'])
     .optional()
     .default('pending')
@@ -271,7 +88,6 @@ export const updateEnquirySchema = z.object({
     .optional(),
   
   email: z.string()
-    .min(1, 'Email is required')
     .email('Please provide a valid email')
     .toLowerCase()
     .trim()
@@ -337,3 +153,4 @@ export const updateEnquirySchema = z.object({
 // Type inference from schema
 export type EnquiryFormInput = z.infer<typeof enquiryFormSchema>;
 export type UpdateEnquiryInput = z.infer<typeof updateEnquirySchema>;
+
