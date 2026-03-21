@@ -50,12 +50,12 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCa
   }
 };
 
-// Configure multer (24MB limit)
+// Configure multer (25MB limit)
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 24 * 1024 * 1024, // 24MB limit
+    fileSize: 25 * 1024 * 1024, // 25MB limit
     files: 1
   }
 });
@@ -68,7 +68,7 @@ export const handlePdfUploadError = (error: any, req: any, res: any, next: any) 
     if (error.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
         success: false,
-        message: 'File size too large. Maximum size is 24MB.'
+        message: 'File size too large. Maximum size is 25MB.'
       });
     }
     if (error.code === 'LIMIT_FILE_COUNT') {
@@ -78,6 +78,6 @@ export const handlePdfUploadError = (error: any, req: any, res: any, next: any) 
       });
     }
   }
-  
+
   next(error);
 };
