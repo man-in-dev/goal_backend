@@ -18,6 +18,7 @@ import spotTestVideoSolutionRoutes from './spotTestVideoSolution';
 import courseRoutes from './course';
 import paymentRoutes from './payment';
 import admissionFormRoutes from './admissionForm';
+import uploadRoutes from './upload';
 
 const router = Router();
 
@@ -41,6 +42,7 @@ router.use('/spot-test-video-solutions', spotTestVideoSolutionRoutes);
 router.use('/courses', courseRoutes);
 router.use('/payment', paymentRoutes);
 router.use('/admission-form', admissionFormRoutes);
+router.use('/upload', uploadRoutes);
 
 // Health check route
 router.get('/health', (req, res) => {

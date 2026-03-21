@@ -17,13 +17,20 @@ import { errorHandler, notFound } from "./middleware/errorHandler";
 const app = express();
 
 // Create uploads directories if they don't exist
-const resumesDir = path.join(__dirname, 'uploads', 'resumes');
-const admissionFormsDir = path.join(__dirname, 'uploads', 'admission-forms');
+const rootDir = path.resolve(__dirname, '..');
+const uploadsDir = path.join(rootDir, 'uploads');
+const resumesDir = path.join(uploadsDir, 'resumes');
+const admissionFormsDir = path.join(uploadsDir, 'admission-forms');
+const pdfsDir = path.join(uploadsDir, 'pdfs');
+
 if (!fs.existsSync(resumesDir)) {
   fs.mkdirSync(resumesDir, { recursive: true });
 }
 if (!fs.existsSync(admissionFormsDir)) {
   fs.mkdirSync(admissionFormsDir, { recursive: true });
+}
+if (!fs.existsSync(pdfsDir)) {
+  fs.mkdirSync(pdfsDir, { recursive: true });
 }
 
 // Connect to database
@@ -104,7 +111,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // Serve static files (uploads)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadsDir));
 
 // Mount routes
 app.use("/api", routes);

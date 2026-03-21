@@ -23,6 +23,7 @@ const spotTestVideoSolution_1 = __importDefault(require("./spotTestVideoSolution
 const course_1 = __importDefault(require("./course"));
 const payment_1 = __importDefault(require("./payment"));
 const admissionForm_1 = __importDefault(require("./admissionForm"));
+const upload_1 = __importDefault(require("./upload"));
 const router = (0, express_1.Router)();
 // Mount routes
 router.use('/auth', auth_1.default);
@@ -44,6 +45,7 @@ router.use('/spot-test-video-solutions', spotTestVideoSolution_1.default);
 router.use('/courses', course_1.default);
 router.use('/payment', payment_1.default);
 router.use('/admission-form', admissionForm_1.default);
+router.use('/upload', upload_1.default);
 // Health check route
 router.get('/health', (req, res) => {
     res.status(200).json({

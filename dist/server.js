@@ -19,13 +19,19 @@ const routes_1 = __importDefault(require("./routes"));
 const errorHandler_1 = require("./middleware/errorHandler");
 const app = (0, express_1.default)();
 // Create uploads directories if they don't exist
-const resumesDir = path_1.default.join(__dirname, 'uploads', 'resumes');
-const admissionFormsDir = path_1.default.join(__dirname, 'uploads', 'admission-forms');
+const rootDir = path_1.default.resolve(__dirname, '..');
+const uploadsDir = path_1.default.join(rootDir, 'uploads');
+const resumesDir = path_1.default.join(uploadsDir, 'resumes');
+const admissionFormsDir = path_1.default.join(uploadsDir, 'admission-forms');
+const pdfsDir = path_1.default.join(uploadsDir, 'pdfs');
 if (!fs_1.default.existsSync(resumesDir)) {
     fs_1.default.mkdirSync(resumesDir, { recursive: true });
 }
 if (!fs_1.default.existsSync(admissionFormsDir)) {
     fs_1.default.mkdirSync(admissionFormsDir, { recursive: true });
+}
+if (!fs_1.default.existsSync(pdfsDir)) {
+    fs_1.default.mkdirSync(pdfsDir, { recursive: true });
 }
 // Connect to database
 (0, db_1.default)();
@@ -90,7 +96,7 @@ app.use((req, res, next) => {
     next();
 });
 // Serve static files (uploads)
-app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, 'uploads')));
+app.use('/uploads', express_1.default.static(uploadsDir));
 // Mount routes
 app.use("/api", routes_1.default);
 // Root route
