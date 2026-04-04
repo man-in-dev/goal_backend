@@ -12,8 +12,8 @@ import { uploadAdmissionDocuments, handleAdmissionUploadError } from '../middlew
 const router = Router();
 
 // Public routes
-router.post('/upload', uploadAdmissionDocuments, handleAdmissionUploadError, uploadAdmissionFiles);
-router.post('/submit', uploadAdmissionDocuments, handleAdmissionUploadError, submitAdmissionForm);
+router.post('/upload', uploadAdmissionFiles);
+router.post('/submit', submitAdmissionForm);
 router.get('/:id', getAdmissionForm);
 
 // Admin routes (should be protected with authentication middleware)

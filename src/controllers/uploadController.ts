@@ -9,31 +9,26 @@ import path from 'path';
 // @route   POST /api/upload/pdf
 // @access  Private
 export const uploadPdfController = asyncHandler(async (req: any, res: Response) => {
-  if (!req.file) {
-    return errorResponse(res, 'No file uploaded', 400);
+  const { name, url, filename, size } = req.body;
+  
+  if (!url) {
+    return errorResponse(res, 'File URL is required', 400);
   }
 
-  const { name } = req.body;
   if (!name) {
-    // If name is missing, cleanup the uploaded file
-    fs.unlinkSync(req.file.path);
     return errorResponse(res, 'Document name is required', 400);
   }
-
-  // Construct URL
-  const filePath = req.file.path.split('uploads')[1].replace(/\\/g, '/');
-  const fileUrl = `${req.protocol}://${req.get('host')}/uploads${filePath}`;
 
   // Save to database
   const pdf = await Pdf.create({
     name,
-    url: fileUrl,
-    filename: req.file.filename,
-    size: req.file.size,
+    url,
+    filename: filename || name,
+    size: size || 0,
     uploadedBy: req.user.id
   });
 
-  successResponse(res, pdf, 'PDF uploaded and saved successfully');
+  successResponse(res, pdf, 'PDF record created successfully');
 });
 
 // @desc    Get all uploaded PDFs

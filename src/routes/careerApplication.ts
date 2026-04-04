@@ -38,7 +38,7 @@ const updateStatusSchema = z.object({
 });
 
 // Public routes
-router.post("/submit", uploadResume, handleUploadError, validateRequest(submitApplicationSchema), submitApplication);
+router.post("/submit", validateRequest(submitApplicationSchema), submitApplication);
 
 // Protected routes (Admin only)
 router.use(protect); // All routes below require authentication

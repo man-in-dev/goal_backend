@@ -53,27 +53,9 @@ export const submitAdmissionForm = asyncHandler(
       phone: req.body.phone 
     });
 
-    // Handle file uploads if present
-    const files = req.files as {
-      passportPhoto?: Express.Multer.File[];
-      reportCard?: Express.Multer.File[];
-      birthCertificate?: Express.Multer.File[];
-      idProof?: Express.Multer.File[];
-    } | undefined;
-    if (files) {
-      if (files.passportPhoto && files.passportPhoto[0]) {
-        req.body.passportPhoto = `/uploads/admission-forms/${files.passportPhoto[0].filename}`;
-      }
-      if (files.reportCard && files.reportCard[0]) {
-        req.body.reportCard = `/uploads/admission-forms/${files.reportCard[0].filename}`;
-      }
-      if (files.birthCertificate && files.birthCertificate[0]) {
-        req.body.birthCertificate = `/uploads/admission-forms/${files.birthCertificate[0].filename}`;
-      }
-      if (files.idProof && files.idProof[0]) {
-        req.body.idProof = `/uploads/admission-forms/${files.idProof[0].filename}`;
-      }
-    }
+    // Handle document URLs if present (already passed in req.body)
+    // The client will now upload to DO Spaces and pass the URLs in:
+    // passportPhoto, reportCard, birthCertificate, idProof
 
     // Convert FormData string values to proper types
     // FormData sends all values as strings, so we need to convert booleans

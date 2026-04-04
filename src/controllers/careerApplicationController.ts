@@ -22,11 +22,9 @@ export const submitApplication = asyncHandler(
       skills,
       coverLetter,
       source,
+      resumeUrl,
+      resumeFileName,
     } = req.body;
-
-    // Handle file upload
-    const resumeUrl = req.file ? `/uploads/resumes/${req.file.filename}` : undefined;
-    const resumeFileName = req.file ? req.file.originalname : undefined;
 
     logger.info("Career application submission attempt", { email, position });
 

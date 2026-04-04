@@ -19,10 +19,7 @@ const errorHandler_1 = require("../middleware/errorHandler");
 // @route   POST /api/career-applications/submit
 // @access  Public
 exports.submitApplication = (0, asyncHandler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { fullName, email, phone, position, experience, education, currentCompany, expectedSalary, skills, coverLetter, source, } = req.body;
-    // Handle file upload
-    const resumeUrl = req.file ? `/uploads/resumes/${req.file.filename}` : undefined;
-    const resumeFileName = req.file ? req.file.originalname : undefined;
+    const { fullName, email, phone, position, experience, education, currentCompany, expectedSalary, skills, coverLetter, source, resumeUrl, resumeFileName, } = req.body;
     logger_1.logger.info("Career application submission attempt", { email, position });
     // Validate required fields
     if (!fullName ||

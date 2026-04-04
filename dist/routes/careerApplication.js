@@ -4,7 +4,6 @@ const express_1 = require("express");
 const careerApplicationController_1 = require("../controllers/careerApplicationController");
 const auth_1 = require("../middleware/auth");
 const validation_1 = require("../middleware/validation");
-const upload_1 = require("../middleware/upload");
 const zod_1 = require("zod");
 const router = (0, express_1.Router)();
 // Validation schemas
@@ -28,7 +27,7 @@ const updateStatusSchema = zod_1.z.object({
     notes: zod_1.z.string().optional(),
 });
 // Public routes
-router.post("/submit", upload_1.uploadResume, upload_1.handleUploadError, (0, validation_1.validateRequest)(submitApplicationSchema), careerApplicationController_1.submitApplication);
+router.post("/submit", (0, validation_1.validateRequest)(submitApplicationSchema), careerApplicationController_1.submitApplication);
 // Protected routes (Admin only)
 router.use(auth_1.protect); // All routes below require authentication
 router.get("/", careerApplicationController_1.getAllApplications);
