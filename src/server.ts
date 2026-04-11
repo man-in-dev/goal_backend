@@ -22,6 +22,7 @@ const uploadsDir = path.join(rootDir, 'uploads');
 const resumesDir = path.join(uploadsDir, 'resumes');
 const admissionFormsDir = path.join(uploadsDir, 'admission-forms');
 const pdfsDir = path.join(uploadsDir, 'pdfs');
+const summerCampDir = path.join(uploadsDir, 'summer-camp');
 
 if (!fs.existsSync(resumesDir)) {
   fs.mkdirSync(resumesDir, { recursive: true });
@@ -31,6 +32,9 @@ if (!fs.existsSync(admissionFormsDir)) {
 }
 if (!fs.existsSync(pdfsDir)) {
   fs.mkdirSync(pdfsDir, { recursive: true });
+}
+if (!fs.existsSync(summerCampDir)) {
+  fs.mkdirSync(summerCampDir, { recursive: true });
 }
 
 // Connect to database

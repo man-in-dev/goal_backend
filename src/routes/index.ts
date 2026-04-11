@@ -19,6 +19,7 @@ import courseRoutes from './course';
 import paymentRoutes from './payment';
 import admissionFormRoutes from './admissionForm';
 import uploadRoutes from './upload';
+import summerCampRoutes from './summerCamp';
 
 const router = Router();
 
@@ -43,6 +44,7 @@ router.use('/courses', courseRoutes);
 router.use('/payment', paymentRoutes);
 router.use('/admission-form', admissionFormRoutes);
 router.use('/upload', uploadRoutes);
+router.use('/summer-camp', summerCampRoutes);
 
 // Health check route
 router.get('/health', (req, res) => {
