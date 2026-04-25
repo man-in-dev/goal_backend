@@ -19,9 +19,7 @@ const publicNoticeValidation = [
     (0, express_validator_1.body)('description')
         .trim()
         .notEmpty()
-        .withMessage('Description is required')
-        .isLength({ max: 2000 })
-        .withMessage('Description cannot be more than 2000 characters'),
+        .withMessage('Description is required'),
     (0, express_validator_1.body)('publishDate')
         .optional()
         .isISO8601()
