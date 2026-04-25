@@ -5,7 +5,8 @@ import {
   getRegistrationById,
   updateRegistrationStatus,
   deleteRegistration,
-  getStats
+  getStats,
+  downloadRegistrationsCSV
 } from '../controllers/summerCampController';
 import { authenticateToken } from '../middleware/auth';
 
@@ -19,6 +20,7 @@ router.use(authenticateToken);
 
 router.get('/', getAllRegistrations);
 router.get('/stats', getStats);
+router.get('/download-csv', downloadRegistrationsCSV);
 router.get('/:id', getRegistrationById);
 router.patch('/:id/status', updateRegistrationStatus);
 router.delete('/:id', deleteRegistration);
