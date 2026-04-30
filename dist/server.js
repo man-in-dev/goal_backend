@@ -36,15 +36,13 @@ if (!fs_1.default.existsSync(pdfsDir)) {
 // Connect to database
 (0, db_1.default)();
 // CORS Configuration - Must be before other middleware
-const allowedOrigins = process.env.CORS_ORIGIN
-    ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
-    : [
-        "https://goalinstitute.org",
-        "https://www.goalinstitute.org",
-        "https://admin.goalinstitute.org",
-        "http://localhost:3000",
-        "http://localhost:3001",
-    ];
+const allowedOrigins = [
+    "https://goalinstitute.org",
+    "https://www.goalinstitute.org",
+    "https://admin.goalinstitute.org",
+    "http://localhost:3000",
+    "http://localhost:3001",
+];
 // CORS middleware with detailed logging
 app.use((0, cors_1.default)({
     origin: (origin, callback) => {

@@ -20,7 +20,7 @@ import paymentRoutes from './payment';
 import admissionFormRoutes from './admissionForm';
 import summerCampRoutes from './summerCamp';
 import uploadRoutes from './upload';
-import neetAnswerKeyRoutes from './neetAnswerKey';
+import neet2026AnswerKeyRoutes from './neet2026AnswerKey';
 
 const router = Router();
 
@@ -46,11 +46,7 @@ router.use('/payment', paymentRoutes);
 router.use('/admission-form', admissionFormRoutes);
 router.use('/summer-camp', summerCampRoutes);
 router.use('/upload', uploadRoutes);
-<<<<<<< HEAD
-router.use('/neet-2026-answerkey', neetAnswerKeyRoutes);
-=======
 router.use('/neet-2026-answerkey', neet2026AnswerKeyRoutes);
->>>>>>> 89c76b007f9eec2186128de804974637f2be3166
 
 // Health check route
 router.get('/health', (req, res) => {

@@ -14,7 +14,6 @@ export interface INeetAnswerKey extends Document {
 const neetAnswerKeySchema = new Schema<INeetAnswerKey>({
   testName: {
     type: String,
-    required: [true, 'Test name is required'],
     trim: true,
     maxlength: [200, 'Test name cannot exceed 200 characters']
   },
