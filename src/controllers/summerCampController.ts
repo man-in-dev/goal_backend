@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { ApiResponse } from "../utils/response";
 import { SummerCampService } from "../services/summerCampService";
 import { CustomError } from "../middleware/errorHandler";
+import SummerCamp from "../models/SummerCamp";
 
 // @desc    Submit summer camp registration
 // @route   POST /api/summer-camp/submit
@@ -96,5 +97,102 @@ export const getStats = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const stats = await SummerCampService.getStats();
     ApiResponse.success(res, stats, "Statistics retrieved successfully");
+  }
+);
+
+// @desc    Download registrations as CSV
+// @route   GET /api/summer-camp/download-csv
+// @access  Private (Admin)
+export const downloadRegistrationsCSV = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const { status, search } = req.query;
+
+    const query: any = {};
+    if (status) query.status = status;
+    if (search) {
+      query.$or = [
+        { studentName: { $regex: search, $options: "i" } },
+        { rollNumber: { $regex: search, $options: "i" } },
+        { studentMobile: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    const registrations = await SummerCamp.find(query).sort({ createdAt: -1 });
+
+    // CSV headers
+    const headers = [
+      "Roll Number",
+      "GTSE Roll Number",
+      "Student Name",
+      "DOB",
+      "Gender",
+      "Category",
+      "Father Name",
+      "Father Occupation",
+      "Student Mobile",
+      "Student WhatsApp",
+      "Parent Mobile",
+      "Parent WhatsApp",
+      "Address",
+      "Post Office",
+      "District",
+      "State",
+      "Pin Code",
+      "Current Class",
+      "School Name",
+      "School Address",
+      "Exam Center",
+      "Status",
+      "Registered On",
+    ];
+
+    // Convert data to CSV format
+    const csvData = registrations.map((reg) => [
+      reg.rollNumber,
+      reg.gtseRollNumber || "",
+      reg.studentName,
+      reg.dob,
+      reg.gender,
+      reg.category,
+      reg.fatherName,
+      reg.fatherOccupation || "",
+      reg.studentMobile,
+      reg.studentWhatsApp || "",
+      reg.parentMobile,
+      reg.parentWhatsApp || "",
+      reg.address,
+      reg.postOffice || "",
+      reg.district,
+      reg.state,
+      reg.pinCode,
+      reg.currentClass,
+      reg.schoolName,
+      reg.schoolAddress || "",
+      reg.examCenter,
+      reg.status,
+      reg.createdAt ? new Date(reg.createdAt).toISOString() : "",
+    ]);
+
+    // Create CSV content
+    const csvContent = [
+      headers.join(","),
+      ...csvData.map((row) =>
+        row
+          .map((field) =>
+            typeof field === "string" && (field.includes(",") || field.includes("\n") || field.includes('"'))
+              ? `"${field.replace(/"/g, '""')}"`
+              : field
+          )
+          .join(",")
+      ),
+    ].join("\n");
+
+    // Set response headers for CSV download
+    const filename = `summer-camp-registrations-${new Date().toISOString().split("T")[0]}.csv`;
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Cache-Control", "no-cache");
+
+    res.send(csvContent);
   }
 );

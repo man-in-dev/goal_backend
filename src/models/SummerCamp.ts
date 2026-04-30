@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface ISummerCamp extends Document {
   studentName: string;
+  gtseRollNumber?: string;
   fatherName: string;
   fatherOccupation?: string;
   dob: string;
@@ -33,6 +34,11 @@ const summerCampSchema = new Schema<ISummerCamp>({
     required: [true, 'Student name is required'],
     trim: true,
     maxlength: [100, 'Name cannot exceed 100 characters']
+  },
+  gtseRollNumber: {
+    type: String,
+    trim: true,
+    maxlength: [50, 'GTSE Roll Number cannot exceed 50 characters']
   },
   fatherName: {
     type: String,
