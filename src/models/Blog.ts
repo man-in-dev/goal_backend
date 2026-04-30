@@ -8,7 +8,7 @@ export interface IBlog extends Document {
   featuredImage?: string;
   imageAlt?: string;
   author: string;
-  category: 'education' | 'career' | 'technology' | 'lifestyle' | 'general';
+  category: 'education' | 'career' | 'technology' | 'lifestyle' | 'general' | 'ranchi';
   tags: string[];
   isPublished: boolean;
   isFeatured: boolean;
@@ -61,7 +61,7 @@ const blogSchema = new Schema<IBlog>({
   },
   category: {
     type: String,
-    enum: ['education', 'career', 'technology', 'lifestyle', 'general'],
+    enum: ['education', 'career', 'technology', 'lifestyle', 'general', 'ranchi'],
     required: [true, 'Category is required']
   },
   tags: [{

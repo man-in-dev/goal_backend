@@ -68,7 +68,7 @@ const blogSchema = new mongoose_1.Schema({
     },
     category: {
         type: String,
-        enum: ['education', 'career', 'technology', 'lifestyle', 'general'],
+        enum: ['education', 'career', 'technology', 'lifestyle', 'general', 'ranchi'],
         required: [true, 'Category is required']
     },
     tags: [{
