@@ -37,9 +37,7 @@ if (!fs.existsSync(pdfsDir)) {
 connectDB();
 
 // CORS Configuration - Must be before other middleware
-const allowedOrigins = process.env.CORS_ORIGIN 
-  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
-  : [
+const allowedOrigins = [
       "https://goalinstitute.org",
       "https://www.goalinstitute.org",
       "https://admin.goalinstitute.org",
