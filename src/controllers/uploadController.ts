@@ -18,8 +18,10 @@ export const uploadFileController = asyncHandler(async (req: any, res: Response)
     return errorResponse(res, 'Document name is required', 400);
   }
 
-  // Build the public URL using the backend base URL
-  const backendBaseUrl = process.env.BACKEND_BASE_URL || `http://localhost:${process.env.PORT || 8000}`;
+  // Build the public URL dynamically based on the request (supports live servers without env var)
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  const host = req.headers.host;
+  const backendBaseUrl = process.env.BACKEND_BASE_URL || `${protocol}://${host}`;
   const fileUrl = `${backendBaseUrl}/uploads/pdfs/${req.file.filename}`;
 
   // Save record to database
