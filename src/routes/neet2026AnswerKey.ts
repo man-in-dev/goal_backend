@@ -8,11 +8,12 @@ import {
   deleteNeetAnswerKey,
   bulkDeleteNeetAnswerKeys
 } from '../controllers/neetAnswerKeyController';
+import { authenticateToken } from '../middleware/auth';
+import { validateRequest } from '../middleware/validation';
 
 const router = express.Router();
 
 const createValidation = [
-  body('testName').trim().notEmpty().withMessage('Test name is required'),
   body('subject').trim().notEmpty().withMessage('Subject is required'),
   body('pdfLink').optional().trim().isURL().withMessage('PDF link must be a valid URL'),
   body('videoLink').optional().trim().isURL().withMessage('Video link must be a valid URL'),
@@ -21,7 +22,6 @@ const createValidation = [
 ];
 
 const updateValidation = [
-  body('testName').optional().trim().notEmpty().withMessage('Test name cannot be empty'),
   body('subject').optional().trim().notEmpty().withMessage('Subject cannot be empty'),
   body('pdfLink').optional().trim().isURL().withMessage('PDF link must be a valid URL'),
   body('videoLink').optional().trim().isURL().withMessage('Video link must be a valid URL'),
@@ -34,9 +34,9 @@ router.get('/', getNeetAnswerKeys);
 router.get('/:id', getNeetAnswerKey);
 
 // Admin routes
-router.post('/', createNeetAnswerKey);
-router.put('/:id', updateNeetAnswerKey);
-router.delete('/:id', deleteNeetAnswerKey);
-router.delete('/', bulkDeleteNeetAnswerKeys);
+router.post('/', authenticateToken, createNeetAnswerKey);
+router.put('/:id', authenticateToken, updateNeetAnswerKey);
+router.delete('/:id', authenticateToken, deleteNeetAnswerKey);
+router.delete('/', authenticateToken, bulkDeleteNeetAnswerKeys);
 
 export default router;

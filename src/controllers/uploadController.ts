@@ -5,7 +5,36 @@ import { successResponse, errorResponse } from '../utils/response';
 import fs from 'fs';
 import path from 'path';
 
-// @desc    Upload PDF and save to database
+// @desc    Upload actual PDF file to server and save record to database
+// @route   POST /api/upload/file
+// @access  Private
+export const uploadFileController = asyncHandler(async (req: any, res: Response) => {
+  if (!req.file) {
+    return errorResponse(res, 'No PDF file provided', 400);
+  }
+
+  const { name } = req.body;
+  if (!name) {
+    return errorResponse(res, 'Document name is required', 400);
+  }
+
+  // Build the public URL using the backend base URL
+  const backendBaseUrl = process.env.BACKEND_BASE_URL || `http://localhost:${process.env.PORT || 8000}`;
+  const fileUrl = `${backendBaseUrl}/uploads/pdfs/${req.file.filename}`;
+
+  // Save record to database
+  const pdf = await Pdf.create({
+    name,
+    url: fileUrl,
+    filename: req.file.originalname,
+    size: req.file.size,
+    uploadedBy: req.user.id
+  });
+
+  successResponse(res, { pdf, url: fileUrl }, 'PDF uploaded and record created successfully');
+});
+
+// @desc    Upload PDF metadata only (URL already stored elsewhere)
 // @route   POST /api/upload/pdf
 // @access  Private
 export const uploadPdfController = asyncHandler(async (req: any, res: Response) => {
@@ -30,6 +59,7 @@ export const uploadPdfController = asyncHandler(async (req: any, res: Response) 
 
   successResponse(res, pdf, 'PDF record created successfully');
 });
+
 
 // @desc    Get all uploaded PDFs
 // @route   GET /api/upload/pdfs
