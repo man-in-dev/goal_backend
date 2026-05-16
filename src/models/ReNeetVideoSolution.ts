@@ -1,16 +1,16 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export interface ISpotTestVideoSolution extends Document {
+export interface IReNeetVideoSolution extends Document {
   testName: string;
   subject: string;
   videoLink?: string;
-  order: number;
+  order: number; // For sorting/ordering
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const spotTestVideoSolutionSchema = new Schema<ISpotTestVideoSolution>({
+const reNeetVideoSolutionSchema = new Schema<IReNeetVideoSolution>({
   testName: {
     type: String,
     required: [true, 'Test name is required'],
@@ -49,10 +49,11 @@ const spotTestVideoSolutionSchema = new Schema<ISpotTestVideoSolution>({
   timestamps: true,
 });
 
-spotTestVideoSolutionSchema.index({ order: 1, isActive: 1 });
-spotTestVideoSolutionSchema.index({ testName: 1 });
-spotTestVideoSolutionSchema.index({ subject: 1 });
+// Indexes for better query performance
+reNeetVideoSolutionSchema.index({ order: 1, isActive: 1 });
+reNeetVideoSolutionSchema.index({ testName: 1 });
+reNeetVideoSolutionSchema.index({ subject: 1 });
 
-const SpotTestVideoSolution = mongoose.models.SpotTestVideoSolution || mongoose.model<ISpotTestVideoSolution>('SpotTestVideoSolution', spotTestVideoSolutionSchema);
+const ReNeetVideoSolution = mongoose.models.ReNeetVideoSolution || mongoose.model<IReNeetVideoSolution>('ReNeetVideoSolution', reNeetVideoSolutionSchema);
 
-export default SpotTestVideoSolution;
+export default ReNeetVideoSolution;
