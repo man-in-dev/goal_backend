@@ -29,15 +29,15 @@ const aitsVideoSolutionSchema = new Schema<IAITSVideoSolution>({
     maxlength: [500, 'Video link cannot exceed 500 characters'],
     validate: {
       validator: function(v: string) {
-        if (!v) return true; // Optional field
+        if (!v || v.trim().length === 0) return true;
         return /^https?:\/\/.+/.test(v);
       },
-      message: 'Video link must be a valid URL'
+      message: 'Video link must be a valid URL (starting with http:// or https://)'
     }
   },
   order: {
     type: Number,
-    default: 0,
+    default: 1,
     index: true
   },
   isActive: {
@@ -57,4 +57,3 @@ aitsVideoSolutionSchema.index({ subject: 1 });
 const AITSVideoSolution = mongoose.models.AITSVideoSolution || mongoose.model<IAITSVideoSolution>('AITSVideoSolution', aitsVideoSolutionSchema);
 
 export default AITSVideoSolution;
-
