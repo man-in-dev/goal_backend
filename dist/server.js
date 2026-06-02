@@ -24,6 +24,7 @@ const uploadsDir = path_1.default.join(rootDir, 'uploads');
 const resumesDir = path_1.default.join(uploadsDir, 'resumes');
 const admissionFormsDir = path_1.default.join(uploadsDir, 'admission-forms');
 const pdfsDir = path_1.default.join(uploadsDir, 'pdfs');
+const summerCampDir = path_1.default.join(uploadsDir, 'summer-camp');
 if (!fs_1.default.existsSync(resumesDir)) {
     fs_1.default.mkdirSync(resumesDir, { recursive: true });
 }
@@ -32,6 +33,9 @@ if (!fs_1.default.existsSync(admissionFormsDir)) {
 }
 if (!fs_1.default.existsSync(pdfsDir)) {
     fs_1.default.mkdirSync(pdfsDir, { recursive: true });
+}
+if (!fs_1.default.existsSync(summerCampDir)) {
+    fs_1.default.mkdirSync(summerCampDir, { recursive: true });
 }
 // Connect to database
 (0, db_1.default)();
