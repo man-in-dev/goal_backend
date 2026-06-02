@@ -18,6 +18,7 @@ const db_1 = __importDefault(require("./src/config/db"));
 // Load environment variables
 dotenv_1.default.config();
 const aitsTestData = [
+    
     {
         testName: "AITS MIN TEST - 01",
         subject: "PHYSICS SOLUTION",
