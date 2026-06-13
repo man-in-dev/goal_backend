@@ -29,6 +29,7 @@ const upload_1 = __importDefault(require("./upload"));
 const neet2026AnswerKey_1 = __importDefault(require("./neet2026AnswerKey"));
 const pageImage_1 = __importDefault(require("./pageImage"));
 const pageSetting_1 = __importDefault(require("./pageSetting"));
+const careerCounselling_1 = __importDefault(require("./careerCounselling"));
 const router = (0, express_1.Router)();
 // Mount routes
 router.use('/auth', auth_1.default);
@@ -56,6 +57,7 @@ router.use('/upload', upload_1.default);
 router.use('/neet-2026-answerkey', neet2026AnswerKey_1.default);
 router.use('/page-images', pageImage_1.default);
 router.use('/page-settings', pageSetting_1.default);
+router.use('/career-counselling', careerCounselling_1.default);
 // Health check route
 router.get('/health', (req, res) => {
     res.status(200).json({
