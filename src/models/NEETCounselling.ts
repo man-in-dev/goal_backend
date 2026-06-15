@@ -7,7 +7,7 @@ export interface INEETCounselling extends Document {
   whatsappNo: string;
   homeTown: string;
   previousSchoolOrCoaching: string;
-  category: 'Government Medical Colleges' | 'Private Medical Colleges' | 'Paramedical Colleges' | 'NEET Repeater Preparation & Strategy';
+  category?: string; // Optional - defaults to 'Government Medical Colleges'
   
   // Generated PDF path
   pdfPath?: string;
@@ -54,13 +54,8 @@ const neetCounsellingSchema = new Schema<INEETCounselling>({
   },
   category: {
     type: String,
-    required: [true, 'Category is required'],
-    enum: [
-      'Government Medical Colleges',
-      'Private Medical Colleges',
-      'Paramedical Colleges',
-      'NEET Repeater Preparation & Strategy'
-    ]
+    default: 'Government Medical Colleges',
+    trim: true
   },
   pdfPath: {
     type: String,
