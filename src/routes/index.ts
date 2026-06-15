@@ -25,6 +25,7 @@ import neet2026AnswerKeyRoutes from './neet2026AnswerKey';
 import pageImageRoutes from './pageImage';
 import pageSettingRoutes from './pageSetting';
 import careerCounsellingRoutes from './careerCounselling';
+import neetCounsellingRoutes from './neetCounselling';
 
 const router = Router();
 
@@ -55,6 +56,7 @@ router.use('/neet-2026-answerkey', neet2026AnswerKeyRoutes);
 router.use('/page-images', pageImageRoutes);
 router.use('/page-settings', pageSettingRoutes);
 router.use('/career-counselling', careerCounsellingRoutes);
+router.use('/neet-counselling', neetCounsellingRoutes);
 
 // Health check route
 router.get('/health', (req, res) => {
