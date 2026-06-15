@@ -28,16 +28,8 @@ export const neetCounsellingFormSchema = z.object({
     .trim(),
   
   category: z.string()
-    .min(1, 'Category is required')
-    .refine(
-      (val) => [
-        'Government Medical Colleges',
-        'Private Medical Colleges',
-        'Paramedical Colleges',
-        'NEET Repeater Preparation & Strategy'
-      ].includes(val),
-      'Please select a valid category'
-    )
+    .optional()
+    .default('Government Medical Colleges')
 });
 
 // Update NEET counselling schema (for PUT requests)
@@ -68,17 +60,7 @@ export const updateNEETCounsellingSchema = z.object({
     .trim()
     .optional(),
   
-  category: z.string()
-    .refine(
-      (val) => [
-        'Government Medical Colleges',
-        'Private Medical Colleges',
-        'Paramedical Colleges',
-        'NEET Repeater Preparation & Strategy'
-      ].includes(val),
-      'Please select a valid category'
-    )
-    .optional(),
+  category: z.string().optional(),
   
   status: z.string()
     .refine(
