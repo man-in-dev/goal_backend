@@ -137,7 +137,7 @@ export const downloadNEETCounsellingCSV = asyncHandler(async (req: Request, res:
   }
 
   // Convert to CSV
-  const headers = ['Name', 'Mobile No', 'WhatsApp No', 'Home Town', 'Previous School/Coaching', 'Category', 'Status', 'Created Date'];
+  const headers = ['Name', 'Mobile No', 'WhatsApp No', 'Home Town', 'Previous School/Coaching', 'Status', 'Created Date'];
   const csvData = [
     headers.join(','),
     ...counsellings.map(c =>
@@ -147,7 +147,6 @@ export const downloadNEETCounsellingCSV = asyncHandler(async (req: Request, res:
         c.whatsappNo,
         `"${c.homeTown}"`,
         `"${c.previousSchoolOrCoaching}"`,
-        `"${c.category}"`,
         c.status,
         new Date(c.createdAt).toLocaleDateString('en-IN')
       ].join(',')
