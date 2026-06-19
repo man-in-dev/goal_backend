@@ -3,10 +3,19 @@ import { asyncHandler } from '../utils/asyncHandler';
 import { ApiResponse } from '../utils/response';
 import { logger } from '../utils/logger';
 
-const MSG91_AUTH_KEY = process.env.MSG91_AUTH_KEY || '1671AgCnJtHK59005008';
-const MSG91_TEMPLATE_ID = process.env.MSG91_TEMPLATE_ID || '1607100000000272166';
+const SMS_AUTH_KEY = process.env.SMS_AUTH_KEY || '1671AgCnJtHK59005008';
+const SMS_SENDER = process.env.SMS_SENDER || 'goaled';
+const SMS_DLT_TE_ID = process.env.SMS_DLT_TE_ID || '1607100000000272166';
+const SMS_API_URL = 'http://sms.gngsms.com/api/sendhttp.php';
 
-// @desc    Send OTP via MSG91
+const OTP_EXPIRY_MS = 5 * 60 * 1000;
+const otpStore = new Map<string, { otp: string; expiresAt: number }>();
+
+function generateOtp(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// @desc    Send OTP via SMS
 // @route   POST /api/otp/send
 // @access  Public
 export const sendOtp = asyncHandler(async (req: Request, res: Response) => {
@@ -21,34 +30,32 @@ export const sendOtp = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const formattedMobile = `91${mobile}`;
-  const url = `https://control.msg91.com/api/v5/otp?template_id=${MSG91_TEMPLATE_ID}&mobile=${formattedMobile}`;
+  const otp = generateOtp();
 
-  let msg91Response: globalThis.Response;
+  otpStore.set(mobile, { otp, expiresAt: Date.now() + OTP_EXPIRY_MS });
+
+  const message = `Dear Students ${otp} is OTP for Goal Institute App log in. GOAL Education Service Private Limited.`;
+  const url = `${SMS_API_URL}?authkey=${SMS_AUTH_KEY}&mobiles=${formattedMobile}&message=${encodeURIComponent(message)}&sender=${SMS_SENDER}&route=4&country=91&DLT_TE_ID=${SMS_DLT_TE_ID}`;
+
+  let smsResponse: globalThis.Response;
   try {
-    msg91Response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'authkey': MSG91_AUTH_KEY,
-      },
-    });
+    smsResponse = await fetch(url, { method: 'POST' });
   } catch (err) {
-    logger.error('MSG91 network error on sendOtp', { error: (err as Error).message, mobile: formattedMobile });
+    logger.error('SMS network error on sendOtp', { error: (err as Error).message, mobile: formattedMobile });
     return ApiResponse.error(res, 'Failed to reach SMS gateway', 500);
   }
 
-  const data = await msg91Response.json() as { type: string; message?: string };
+  const text = await smsResponse.text();
+  logger.info('SMS sendOtp response', { status: smsResponse.status, body: text, mobile: formattedMobile });
 
-  logger.info('MSG91 sendOtp response', { status: msg91Response.status, data, mobile: formattedMobile });
-
-  if (data.type === 'success') {
+  if (smsResponse.ok) {
     return ApiResponse.success(res, null, 'OTP sent successfully');
   } else {
-    return ApiResponse.error(res, data.message || 'Failed to send OTP', 400);
+    return ApiResponse.error(res, text || 'Failed to send OTP', 400);
   }
 });
 
-// @desc    Verify OTP via MSG91
+// @desc    Verify OTP
 // @route   POST /api/otp/verify
 // @access  Public
 export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
@@ -62,32 +69,30 @@ export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
     return ApiResponse.error(res, 'Mobile number must be 10 digits', 400);
   }
 
-  const formattedMobile = `91${mobile}`;
-  const url = `https://control.msg91.com/api/v5/otp/verify?otp=${otp}&mobile=${formattedMobile}`;
+  const entry = otpStore.get(mobile);
 
-  const msg91Response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'authkey': MSG91_AUTH_KEY,
-    },
-  });
-
-  const data = await msg91Response.json() as { type: string; message?: string };
-
-  logger.info('MSG91 verifyOtp response', { status: msg91Response.status, data, mobile: formattedMobile });
-
-  if (data.type === 'success' || data.message === 'OTP verified success') {
-    return ApiResponse.success(res, null, 'OTP verified successfully');
-  } else {
-    return ApiResponse.error(res, data.message || 'Invalid OTP', 400);
+  if (!entry) {
+    return ApiResponse.error(res, 'OTP not found. Please request a new OTP.', 400);
   }
+
+  if (Date.now() > entry.expiresAt) {
+    otpStore.delete(mobile);
+    return ApiResponse.error(res, 'OTP has expired. Please request a new OTP.', 400);
+  }
+
+  if (entry.otp !== otp) {
+    return ApiResponse.error(res, 'Invalid OTP', 400);
+  }
+
+  otpStore.delete(mobile);
+  return ApiResponse.success(res, null, 'OTP verified successfully');
 });
 
-// @desc    Resend OTP via MSG91
+// @desc    Resend OTP
 // @route   POST /api/otp/resend
 // @access  Public
 export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
-  const { mobile, retryType } = req.body;
+  const { mobile } = req.body;
 
   if (!mobile) {
     return ApiResponse.error(res, 'Mobile number is required', 400);
@@ -98,25 +103,27 @@ export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const formattedMobile = `91${mobile}`;
-  // retryType: 'voice' for voice call, 'text' for SMS (default)
-  const retry = retryType === 'voice' ? 'voice' : 'text';
-  const url = `https://control.msg91.com/api/v5/otp/retry?mobile=${formattedMobile}&retrytype=${retry}`;
+  const otp = generateOtp();
 
-  const msg91Response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'authkey': MSG91_AUTH_KEY,
-    },
-  });
+  otpStore.set(mobile, { otp, expiresAt: Date.now() + OTP_EXPIRY_MS });
 
-  const data = await msg91Response.json() as { type: string; message?: string };
+  const message = `Dear Students ${otp} is OTP for Goal Institute App log in. GOAL Education Service Private Limited.`;
+  const url = `${SMS_API_URL}?authkey=${SMS_AUTH_KEY}&mobiles=${formattedMobile}&message=${encodeURIComponent(message)}&sender=${SMS_SENDER}&route=4&country=91&DLT_TE_ID=${SMS_DLT_TE_ID}`;
 
-  logger.info('MSG91 resendOtp response', { status: msg91Response.status, data, mobile: formattedMobile });
+  let smsResponse: globalThis.Response;
+  try {
+    smsResponse = await fetch(url, { method: 'POST' });
+  } catch (err) {
+    logger.error('SMS network error on resendOtp', { error: (err as Error).message, mobile: formattedMobile });
+    return ApiResponse.error(res, 'Failed to reach SMS gateway', 500);
+  }
 
-  if (data.type === 'success') {
+  const text = await smsResponse.text();
+  logger.info('SMS resendOtp response', { status: smsResponse.status, body: text, mobile: formattedMobile });
+
+  if (smsResponse.ok) {
     return ApiResponse.success(res, null, 'OTP resent successfully');
   } else {
-    return ApiResponse.error(res, data.message || 'Failed to resend OTP', 400);
+    return ApiResponse.error(res, text || 'Failed to resend OTP', 400);
   }
 });
