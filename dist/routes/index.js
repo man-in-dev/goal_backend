@@ -32,6 +32,7 @@ const pageImage_1 = __importDefault(require("./pageImage"));
 const pageSetting_1 = __importDefault(require("./pageSetting"));
 const careerCounselling_1 = __importDefault(require("./careerCounselling"));
 const neetCounselling_1 = __importDefault(require("./neetCounselling"));
+const otp_1 = __importDefault(require("./otp"));
 const router = (0, express_1.Router)();
 // Mount routes
 router.use('/auth', auth_1.default);
@@ -62,6 +63,7 @@ router.use('/page-images', pageImage_1.default);
 router.use('/page-settings', pageSetting_1.default);
 router.use('/career-counselling', careerCounselling_1.default);
 router.use('/neet-counselling', neetCounselling_1.default);
+router.use('/otp', otp_1.default);
 // Health check route
 router.get('/health', (req, res) => {
     res.status(200).json({
