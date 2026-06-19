@@ -27,6 +27,7 @@ import pageImageRoutes from './pageImage';
 import pageSettingRoutes from './pageSetting';
 import careerCounsellingRoutes from './careerCounselling';
 import neetCounsellingRoutes from './neetCounselling';
+import otpRoutes from './otp';
 
 const router = Router();
 
@@ -59,6 +60,7 @@ router.use('/page-images', pageImageRoutes);
 router.use('/page-settings', pageSettingRoutes);
 router.use('/career-counselling', careerCounsellingRoutes);
 router.use('/neet-counselling', neetCounsellingRoutes);
+router.use('/otp', otpRoutes);
 
 // Health check route
 router.get('/health', (req, res) => {
