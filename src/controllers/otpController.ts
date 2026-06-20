@@ -5,7 +5,7 @@ import { logger } from '../utils/logger';
 
 const SMS_AUTH_KEY = process.env.SMS_AUTH_KEY || '1671AgCnJtHK59005008';
 const SMS_SENDER = process.env.SMS_SENDER || 'goaled';
-const SMS_DLT_TE_ID = process.env.SMS_DLT_TE_ID || '1607100000000272166';
+const SMS_DLT_TE_ID = process.env.SMS_DLT_TE_ID || '1607100000000384389';
 const SMS_API_URL = 'http://sms.gngsms.com/api/sendhttp.php';
 
 const OTP_EXPIRY_MS = 5 * 60 * 1000;
@@ -34,7 +34,7 @@ export const sendOtp = asyncHandler(async (req: Request, res: Response) => {
 
   otpStore.set(mobile, { otp, expiresAt: Date.now() + OTP_EXPIRY_MS });
 
-  const message = `Dear Students ${otp} is OTP for Goal Institute App log in. GOAL Education Service Private Limited.`;
+  const message = `Your OTP is ${otp}. Please enter OTP in the provided field.\nGoal Institute`;
   const url = `${SMS_API_URL}?authkey=${SMS_AUTH_KEY}&mobiles=${formattedMobile}&message=${encodeURIComponent(message)}&sender=${SMS_SENDER}&route=4&country=91&DLT_TE_ID=${SMS_DLT_TE_ID}`;
 
   let smsResponse: globalThis.Response;
@@ -107,7 +107,7 @@ export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
 
   otpStore.set(mobile, { otp, expiresAt: Date.now() + OTP_EXPIRY_MS });
 
-  const message = `Dear Students ${otp} is OTP for Goal Institute App log in. GOAL Education Service Private Limited.`;
+  const message = `Your OTP is ${otp}. Please enter OTP in the provided field.\nGoal Institute`;
   const url = `${SMS_API_URL}?authkey=${SMS_AUTH_KEY}&mobiles=${formattedMobile}&message=${encodeURIComponent(message)}&sender=${SMS_SENDER}&route=4&country=91&DLT_TE_ID=${SMS_DLT_TE_ID}`;
 
   let smsResponse: globalThis.Response;

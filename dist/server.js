@@ -84,6 +84,8 @@ const limiter = (0, express_rate_limit_1.default)({
 });
 // app.use("/api/", limiter);
 // Body parser
+// Trust proxy headers (for correct client IP when behind Nginx etc.)
+app.set('trust proxy', true);
 app.use(express_1.default.json({ limit: "10mb" }));
 app.use(express_1.default.urlencoded({ extended: true, limit: "10mb" }));
 // Sanitize data
