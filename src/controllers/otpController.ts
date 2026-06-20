@@ -107,7 +107,7 @@ export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
 
   otpStore.set(mobile, { otp, expiresAt: Date.now() + OTP_EXPIRY_MS });
 
-  const message = `Dear Students ${otp} is OTP for Goal Institute App log in. GOAL Education Service Private Limited.`;
+  const message = `Your OTP is ${otp}. Please enter OTP in the provided field.\nGoal Institute`;
   const url = `${SMS_API_URL}?authkey=${SMS_AUTH_KEY}&mobiles=${formattedMobile}&message=${encodeURIComponent(message)}&sender=${SMS_SENDER}&route=4&country=91&DLT_TE_ID=${SMS_DLT_TE_ID}`;
 
   let smsResponse: globalThis.Response;

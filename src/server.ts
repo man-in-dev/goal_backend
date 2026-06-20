@@ -94,6 +94,9 @@ const limiter = rateLimit({
 // app.use("/api/", limiter);
 
 // Body parser
+// Trust proxy headers (for correct client IP when behind Nginx etc.)
+app.set('trust proxy', true);
+
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 

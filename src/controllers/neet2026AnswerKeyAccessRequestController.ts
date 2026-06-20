@@ -59,6 +59,29 @@ export const getNeet2026AnswerKeyAccessRequests = asyncHandler(
   }
 );
 
+export const checkNeet2026AnswerKeyAccessRequest = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { deviceId, ipAddress } = req.query;
+
+    if (!deviceId && !ipAddress) {
+      return ApiResponse.error(res, 'Device ID or IP address is required', 400);
+    }
+
+    const orConditions: Record<string, string>[] = [];
+    if (deviceId) orConditions.push({ deviceId: deviceId as string });
+    if (ipAddress) orConditions.push({ ipAddress: ipAddress as string });
+
+    const existing = await Neet2026AnswerKeyAccessRequest.findOne({ $or: orConditions });
+
+    return ApiResponse.success(
+      res,
+      { accessGranted: !!existing },
+      existing ? 'Access granted' : 'No access found',
+      200
+    );
+  }
+);
+
 export const deleteNeet2026AnswerKeyAccessRequest = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.params;
